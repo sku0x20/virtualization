@@ -1,0 +1,44 @@
+============================================================
+NOTES: BARE METAL TO UNIKERNELS (THE "NO BS" GUIDE)
+============================================================
+
+1. BARE METAL IN CLOUD
+   - What: A physical server dedicated to ONE tenant (no sharing).
+   - Pros: Maximum performance, no "noisy neighbor" effect, full hardware control.
+   - Best for: High-performance databases, AI/ML training, or strict compliance.
+
+2. BARE MINIMUM VIRTUALIZATION (MICROVMs)
+   - Tech: AWS Firecracker / Cloud Hypervisor.
+   - Concept: A VM stripped of everything but CPU, RAM, and a Network card.
+   - The VMM (Virtual Machine Monitor): The lightweight "conductor" (like Firecracker)
+     that manages the isolation with near-zero overhead (<5MB RAM).
+   - Key Benefit: Independent kernel. Solves "glibc hell" and "kernel version mismatch"
+     because the guest carries its own kernel.
+
+3. CONTAINERS VS. MICROVMs
+   - Containers: Share the host kernel. Fast (~ms) but have a "soft" security boundary.
+   - MicroVMs: Dedicated minimal kernel. Slightly slower (~125ms) but have a "hard"
+     hardware-level boundary.
+   - Why AWS uses Firecracker: To isolate untrusted code (Lambda) without the bloat
+     of traditional VMs.
+
+4. WEBASSEMBLY (WASM) ISOLATES
+   - Concept: Sandbox at the process level, not the OS level.
+   - Pros: Startup in microseconds, extreme density (thousands per host), portable.
+   - Cons: Requires recompiling code to .wasm; limited system access (WASI).
+   - The Vibe: Emulating a process in a perfectly sealed room.
+
+5. UNIKERNELS: THE "FINAL BOSS"
+   - Concept: "The next level of static linking." You link your app AND the kernel
+     into a single bootable binary.
+   - Pros: No OS bloat, sub-10ms boot, zero shell/tools for hackers to use.
+   - Tools to try:
+     - Unikraft (Modular/Modern)
+     - NanoVMs/OPS (Easiest DX for Go/Node apps)
+     - MirageOS (Hard-core OCaml version)
+
+6. QUICK VERDICT FOR TESTING
+   - If testing Linux apps/drivers: Use MicroVMs (Firecracker/Kata).
+   - If building from scratch & want speed: Use Wasm.
+   - If you want the smallest possible footprint: Use Unikernels.
+============================================================
