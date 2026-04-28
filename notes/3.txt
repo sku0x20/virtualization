@@ -1,0 +1,61 @@
+yeah how unikraft does it?
+also remove microvm cause they are useless imo, until untrusted code.
+which cloud provider do. as deployment and packing its useless and it makes sense why no image and all. cause its a vm at the end. not a distributing.
+
+from deployment pov, containers make sense. unikernal makes sense.
+now lets compare these 2.
+
+
+
+That is a sharp architectural take. You’ve correctly identified that MicroVMs are a "security fix" for providers, not a "deployment fix" for developers. If you trust your code, MicroVMs are just a heavy middle-man.
+For Deployment and Packing, the battle is between the Shared Kernel (Container) and the Static Binary (Unikernel).
+
+Comparison: Containers vs. Unikernels (Deployment POV)
+Feature	Containers (OCI)	Unikernels (Static Image)
+Packaging	Layers (shared across images)	Single flat binary (Self-contained)
+Kernel	Shared (Host Kernel)	Library (Compiled into the app)
+Security	Process isolation (Cgroups/Namespaces)	Hardware isolation (Hypervisor)
+Updates	Update the App layer	Re-link/Re-compile the whole Image
+Footprint	Small (MBs)	Tiny (KBs to few MBs)
+Overhead	Context switches (User vs Kernel)	Zero (Single address space)
+
+
+============================================================
+DOCUMENTATION: CONTAINERS VS. UNIKERNELS
+============================================================
+
+1. THE CONTAINER MODEL (SHARED EFFICIENCY)
+------------------------------------------
+- MECHANISM: Uses Linux Namespaces and Cgroups to sandbox a process.
+- KERNEL: Shared. All containers talk to the same Host Kernel.
+- DEPLOYMENT: Highly efficient for packing. Uses "Layers" so multiple
+  apps can share the same base library memory (Page Cache).
+- WEAKNESS: Context switching between User Mode and Kernel Mode
+  creates a performance "tax" on every system call.
+
+2. THE UNIKERNEL MODEL (STATIC ISOLATION)
+-----------------------------------------
+- MECHANISM: The application is linked directly to a Library OS (like Unikraft).
+- KERNEL: Private. Each app has its own specialized kernel code.
+- DEPLOYMENT: The ultimate static binary. The image is bootable
+  directly by a Type-1 Hypervisor.
+- STRENGTH: Zero Context Switching. The application runs with
+  hardware privileges, leading to maximum I/O throughput.
+- WEAKNESS: No memory sharing between different unikernels
+  (each loads its own stack).
+
+3. SPEED & PERFORMANCE
+----------------------
+- STARTUP: Containers (~50ms) vs Unikernels (~10ms).
+- I/O THROUGHPUT: Unikernels win because they don't have to
+  hand off data between User and Kernel space.
+- MEMORY FOOTPRINT: Containers win for running 100+ instances
+  of the same app (shared memory). Unikernels win for single-instance
+  efficiency.
+
+============================================================
+CONCLUSION
+============================================================
+Containers are for **Scale and Packing**.
+Unikernels are for **Performance and Hard Isolation**.
+============================================================

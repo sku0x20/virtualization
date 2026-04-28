@@ -1,0 +1,17 @@
+so fundamentally if you see.
+micro vms not that helpful. its unneeded intermediate part. and can be easily skipped.
+now it should be unikernels.
+
+if you see.
+type 1 hyperwiser which can spin up unikernels.
+so os concept is itself gone.
+
+or its not like that cause. theres a reason dynamic linking exists.
+sharing. unikernel issue is same code loaded by multiple unikernels
+and containers solve that specific problem. kernal code sharing.
+
+
+
+If you use a Type-1 Hypervisor (like Xen or bare-metal KVM) to boot Unikernels, then yes: the traditional General Purpose Operating System (GPOS) is gone.
+You no longer have a "Host OS" with a desktop, a shell, or background cron jobs.
+The Hypervisor becomes the "Thin OS," and your applications are the "Plugins."
