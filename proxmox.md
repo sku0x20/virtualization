@@ -1,5 +1,12 @@
 # Proxmox Installation
 
+## Why Proxmox/virtualization?
+- to virtualize hardware
+- to run multiple OSes on a single machine
+- decoupled compute and ram
+- decoupled storage and network
+- test different k8s distributions, different storage strategies.
+
 ## 1. Prepare Bootable USB with Ventoy
 
 [Ventoy](https://www.ventoy.net) lets you boot multiple ISOs from a single USB drive — no re-flashing needed.
