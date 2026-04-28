@@ -1,0 +1,7 @@
+Kernel Same-page Merging
+
+https://docs.kernel.org/admin-guide/mm/ksm.html
+
+If you want to test this locally, you can check if it's running on your Linux machine by looking at /sys/kernel/mm/ksm/run (1 = active, 0 = disabled)
+
+The Bridge: By enabling KSM on the host, the hypervisor can find those identical kernel/library pages inside different Unikernels and merge them, effectively giving you "container-like" memory sharing while keeping "hardware-level" isolation.
