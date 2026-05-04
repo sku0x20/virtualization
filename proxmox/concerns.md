@@ -2,7 +2,7 @@
 
 ## Network Setup
 
-- **Plan:** Reinstall with static IPv4 only, clear all IPv6 fields during install
+- **Plan:** No reinstall needed — edit `vmbr0` in UI (System → Network), add static IPv4, remove IPv6, apply config
 
 ## Self-Signed Certificate
 
