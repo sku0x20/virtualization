@@ -1,10 +1,10 @@
 # Proxmox Concerns & Open Questions
 
-## IPv6 Issue
+## Network Setup
 
-- Installer auto-detected IPv6 (router has it enabled by default)
-- Don't want IPv6 — unclear how it behaves for VMs, global addresses are exposed, routing is tricky
-- **Plan:** Reinstall with static IPv4 only, leave IPv6 fields blank or clear them during install
+- Installer auto-detected IPv6; domain already points to this IPv6 address
+- Need to also add a static IPv4 for local network access
+- **Plan:** Keep IPv6, add static IPv4 alongside it — no reinstall needed, configure via UI (System → Network) or `/etc/network/interfaces`
 
 ## Self-Signed Certificate
 
@@ -13,6 +13,7 @@
   - Add a browser exception (quick but annoying)
   - Replace with a Let's Encrypt cert via the UI (requires a domain name pointing to the node)
   - Use a local CA and trust it on your machines
+- **Plan:** Use Let's Encrypt via domain (resolves to IPv6) — Proxmox has built-in ACME support under System → Certificates
 
 ## Web UI Complexity
 
