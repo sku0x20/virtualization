@@ -2,7 +2,7 @@
 
 ## Network Setup
 
-- **Plan:** No reinstall needed — edit `vmbr0` in UI (System → Network), add static IPv4, remove IPv6, apply config
+- **Plan:** No reinstall needed — edit `vmbr0` in UI (System → Network), add static IPv4, leave IPv6 as-is, apply config. Proxmox will be reachable on both.
 
 ## Self-Signed Certificate
 
