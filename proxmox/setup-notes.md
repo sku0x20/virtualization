@@ -8,6 +8,13 @@
 - In router mode Deco handed out IPv4 via its own DHCP; in AP mode it bridges to the main router which prefers IPv6 — that's why Proxmox auto-detected IPv6 during install
 - Fix: assign a static IPv4 manually (either during install or from the UI later) — no way to ask it to auto-detect IPv4, has to be static either way
 
+## TLS Certificate via Let's Encrypt ACME
+
+- Added a trusted HTTPS certificate to the Proxmox web UI using Let's Encrypt ACME
+- Used the HTTP-01 challenge type with the node's IPv6 address as the domain (e.g. `[2xxx:...].nip.io` or a DNS record pointing to the IPv6)
+- Configured under Node → System → Certificates → ACME in the Proxmox UI
+- After issuance, Proxmox automatically uses the certificate for its web interface (port 8006) — no manual restart needed
+
 ## IPv6 Neighbor Discovery (NDP) Across Mesh Nodes
 
 - Devices on different Deco mesh nodes cannot discover each other via `ping6 ff02::1%<iface>` (all-nodes multicast) — the mesh drops this broadcast across nodes
