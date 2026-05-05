@@ -10,10 +10,15 @@
 
 ## TLS Certificate via Let's Encrypt ACME
 
-- Added a trusted HTTPS certificate to the Proxmox web UI using Let's Encrypt ACME
+- Proxmox installs with a self-signed cert by default — browser warns on every access until replaced
+- Added a trusted HTTPS certificate using Let's Encrypt ACME (Node → System → Certificates → ACME)
 - Used the HTTP-01 challenge type with the node's IPv6 address as the domain (e.g. `[2xxx:...].nip.io` or a DNS record pointing to the IPv6)
-- Configured under Node → System → Certificates → ACME in the Proxmox UI
 - After issuance, Proxmox automatically uses the certificate for its web interface (port 8006) — no manual restart needed
+
+## Web UI
+
+- UI has a lot of options — read docs before touching things
+- Docs: https://pve.proxmox.com/pve-docs/
 
 ## IPv6 Neighbor Discovery (NDP) Across Mesh Nodes
 
