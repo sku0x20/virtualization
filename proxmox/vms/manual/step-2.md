@@ -2,6 +2,8 @@
 
 Same as step 1 but entirely from the command line. SSH into the Proxmox host first.
 
+Prefer cloud images — no ISO or installer needed. Disk is imported separately after VM creation (see step 3).
+
 ---
 
 ## Core Tool: `qm`
@@ -31,14 +33,16 @@ qm create $VM_ID \
   --cores 2 \
   --memory 2048 \
   --machine q35 \
+  --bios ovmf \
   --net0 "virtio,bridge=vmbr0"
 ```
 
-## Attach an ISO
+## Add an EFI Disk
+
+Required when using OVMF. Proxmox stores UEFI vars (boot order, Secure Boot state) here.
 
 ```bash
-qm set $VM_ID --ide2 local:iso/your-image.iso,media=cdrom
-qm set $VM_ID --boot order=ide2
+qm set $VM_ID --efidisk0 local-lvm:1,efitype=4m,pre-enrolled-keys=0
 ```
 
 ## Add a Disk
@@ -83,10 +87,24 @@ cat /etc/pve/qemu-server/$VM_ID.conf   # same, as raw file
 | `--cores` | `2` | vCPU count |
 | `--memory` | `2048` | RAM in MB |
 | `--machine` | `q35` | chipset type |
+| `--bios` | `ovmf` | UEFI firmware (enables GPT) |
+| `--efidisk0` | `local-lvm:1,efitype=4m,pre-enrolled-keys=0` | EFI var store (required for OVMF) |
 | `--cpu` | `host` | CPU model (pass-through) |
 | `--net0` | `virtio,bridge=vmbr0` | first NIC |
 | `--scsi0` | `local-lvm:20` | first SCSI disk |
-| `--ide2` | `local:iso/x.iso,media=cdrom` | CD-ROM |
 | `--boot` | `order=scsi0` | boot device order |
 | `--serial0` | `socket` | serial console (needed for cloud images) |
 | `--vga` | `serial0` | redirect VGA to serial |
+
+---
+
+## Appendix: ISO Installation (e.g. Ubuntu Server)
+
+If using a traditional installer ISO instead of a cloud image:
+
+```bash
+qm set $VM_ID --ide2 local:iso/ubuntu-server.iso,media=cdrom
+qm set $VM_ID --boot order=ide2
+```
+
+Boot the VM — the installer runs interactively. Not applicable for Flatcar or other cloud-image-only distros.

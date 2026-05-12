@@ -1,6 +1,8 @@
-# Step 1 — Create a VM via Proxmox UI (ISO)
+# Step 1 — Create a VM via Proxmox UI
 
 Goal: understand Proxmox's virtual hardware model by creating a VM manually through the UI.
+
+Prefer cloud images over ISOs — they boot directly as pre-built disks with no installer step. The wizard still applies; disk is imported separately after VM creation (see step 3).
 
 ---
 
@@ -30,8 +32,8 @@ A virtual switch on the host. VMs connect to `vmbr0` and appear on your LAN as i
 - `q35` — modern PCIe chipset, required for some features (NVMe, USB3, UEFI Secure Boot)
 
 **BIOS**
-- `SeaBIOS` — legacy BIOS, simpler, works for most Linux
-- `OVMF` — UEFI firmware, required for Secure Boot or Windows
+- `OVMF` — UEFI firmware, enables GPT partition tables and modern boot. Preferred.
+- `SeaBIOS` — legacy BIOS, MBR-only. Avoid for new VMs.
 
 **SCSI Controller**
 - `VirtIO SCSI` — paravirtualized, best disk throughput for Linux
@@ -51,7 +53,7 @@ Right-click the node → **Create VM**
 ### OS
 | Field | Value |
 |-------|-------|
-| ISO Image | select uploaded ISO |
+| ISO Image | Do not use any media |
 | Guest OS Type | Linux |
 | Kernel version | 6.x - 2.6 Kernel |
 
@@ -59,7 +61,8 @@ Right-click the node → **Create VM**
 | Field | Value |
 |-------|-------|
 | Machine | q35 |
-| BIOS | SeaBIOS |
+| BIOS | OVMF (UEFI) |
+| EFI Disk | Add EFI disk → local-lvm, pre-enrolled keys off |
 | SCSI Controller | VirtIO SCSI single |
 
 ### Disks
@@ -89,16 +92,12 @@ Right-click the node → **Create VM**
 
 ---
 
-## Upload an ISO
+## Appendix: ISO Installation (e.g. Ubuntu Server)
 
-`local` storage → **ISO Images** → **Upload** (from your machine)
-or **Download from URL** (fetches directly on the Proxmox host — faster).
+Some distros (Ubuntu Server, Debian) ship a traditional installer ISO. Steps if you want to use that path:
 
----
+1. Upload the ISO: `local` storage → **ISO Images** → **Upload** or **Download from URL**
+2. In the OS step, select the uploaded ISO instead of "Do not use any media"
+3. Boot the VM — the installer runs interactively, partitions the disk, and installs the OS
 
-## Notes on Flatcar + ISO
-
-Flatcar does not ship a traditional click-through installer ISO.
-This step is for learning the Proxmox UI. The production workflow (step 3) uses a pre-built disk image instead.
-
-If you want to explore the ISO path anyway, Flatcar provides a rescue ISO — you boot it, then run `flatcar-install` to write the OS onto the disk manually.
+Not applicable for Flatcar or other cloud-image-only distros.
