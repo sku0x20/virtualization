@@ -10,53 +10,68 @@
 
 ### 1. Download Flatcar Image
 
-In Proxmox web UI: `local` storage → **ISO Images** → **Download from URL**
+Flatcar ships a Proxmox-specific image (no decompression needed).
+Download directly on the Proxmox host:
 
-```
-https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_qemu_image.img.bz2
-```
-
-Decompress on the Proxmox host after download:
 ```bash
-cd /var/lib/vz/template/iso
-bunzip2 flatcar_production_qemu_image.img.bz2
+wget https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img
 ```
 
 ### 2. Create VM & Import Disk
 
-SSH into Proxmox host:
+Proxmox UI only supports ISO images — VM creation must be done via CLI:
 
 ```bash
-qm create 9000 --name flatcar-template --memory 2048 --cores 2 --net0 virtio,bridge=vmbr0
-qm importdisk 9000 /var/lib/vz/template/iso/flatcar_production_qemu_image.img local-lvm
-qm set 9000 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-9000-disk-0
-qm set 9000 --boot c --bootdisk scsi0
-qm set 9000 --serial0 socket --vga serial0
+export VM_ID=9000
+
+qm create $VM_ID --name flatcar-template --cores 2 --memory 2048 \
+  --net0 "virtio,bridge=vmbr0" --ipconfig0 "ip=dhcp"
+
+qm disk import $VM_ID flatcar_production_proxmoxve_image.img local-lvm
+
+qm set $VM_ID --scsi0 local-lvm:vm-$VM_ID-disk-0
+qm set $VM_ID --boot order=scsi0
+
+# Required even for Ignition config
+qm set $VM_ID --ide2 local-lvm:cloudinit
 ```
 
 ### 3. Configure First-Boot
 
-Flatcar supports both Ignition and cloud-init. Proxmox's native cloud-init works for basics (SSH key, user).
+Pick **one** — Ignition and cloud-init share the same `user-data` slot and can't coexist.
 
-Add a cloud-init drive:
-```bash
-qm set 9000 --ide2 local-lvm:cloudinit
+**Option A: cloud-init (basic — SSH key, hostname, network)**
+Set via UI: VM → Cloud-Init tab
+
+**Option B: Ignition (full control — systemd units, files, k3s install)**
+
+Create `/var/lib/vz/snippets/user-data`:
+```json
+{
+  "ignition": { "version": "3.0.0" },
+  "passwd": {
+    "users": [{
+      "name": "core",
+      "sshAuthorizedKeys": ["ssh-ed25519 your-public-ssh-key"]
+    }]
+  }
+}
 ```
 
-Set SSH key and user via UI: VM → **Cloud-Init tab**
-
-For anything beyond basics (e.g. auto-installing k3s on boot), pass a custom user-data file:
+Apply:
 ```bash
-qm set 9000 --cicustom "user=local:snippets/flatcar-user-data.yaml"
+qm set $VM_ID --cicustom "user=local:snippets/user-data"
 ```
+
+Note: cloud-init services will log failures when Ignition is used — expected, harmless.
 
 ### 4. Convert to Template
 
 ```bash
-qm template 9000
+qm template $VM_ID
 ```
 
-Or UI: right-click VM → **Convert to Template** (VM becomes read-only, cloneable)
+Or UI: right-click VM → **Convert to Template**
 
 ### 5. Clone for Each k3s Node
 
@@ -77,3 +92,7 @@ Start each clone — first-boot config runs automatically.
 | 103 | worker | 2 GB | 2 |
 
 Leaves ~2 GB for the Proxmox host itself.
+
+## Reference
+
+https://www.flatcar.org/docs/latest/installing/community-platforms/proxmoxve/
