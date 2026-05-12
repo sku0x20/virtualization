@@ -13,6 +13,23 @@ Skip the ISO installer entirely. Import a pre-built disk image, configure via cl
 
 ---
 
+## Image Types
+
+"QEMU image" just means the file format (`.img` / `.qcow2`) — not a category. What matters is what's baked inside.
+
+| Type | Example | What's inside | Best for |
+|------|---------|---------------|----------|
+| **Generic QEMU** | `flatcar_production_qemu_image.img` | Bare OS, no hypervisor tuning | Any KVM hypervisor |
+| **Cloud image** | `noble-server-cloudimg-amd64.img` | Generic QEMU + cloud-init pre-installed | Ubuntu, Debian on any cloud/hypervisor |
+| **Platform-specific** | `flatcar_production_proxmoxve_image.img` | Drivers and config pre-tuned for Proxmox | Flatcar on Proxmox |
+
+**Preference order:**
+1. Platform-specific image if the distro ships one (Flatcar does for Proxmox) ← use this
+2. Cloud image otherwise (Ubuntu, Debian)
+3. Generic QEMU — last resort, everything must be configured manually
+
+---
+
 ## Option A: Generic QEMU Image (any distro)
 
 Use this for Ubuntu, Debian, Alpine, etc.
