@@ -33,6 +33,5 @@ Rancher built K3OS as a purpose-built OS for k3s. It is now **archived and unmai
 
 ## Decision
 
-TBD — depends on available RAM on Proxmox host.
-- RAM-constrained: prefer **Fedora CoreOS** (1 GB min)
-- Stability-first: prefer **Flatcar**
+**Flatcar Container Linux** — host has 8 GB RAM, stability preferred over minimum footprint.
+3-node k3s cluster (1 control + 2 workers) at 2 GB each = 6 GB, leaves ~2 GB for Proxmox host.
