@@ -72,6 +72,24 @@ Right-click the node → **Create VM**
 | Disk size | 20 GB |
 | Cache | Write back |
 
+**Disk cache modes** — controls when the host tells the guest a write is complete:
+
+| Mode | Host caches reads | Host caches writes | Write acknowledged when... |
+|---|---|---|---|
+| No cache | No | No | Data hits physical disk |
+| Write through | Yes | No | Data hits physical disk |
+| **Write back** | Yes | Yes | Data hits host RAM |
+| Write back (unsafe) | Yes | Yes | Data hits QEMU buffer |
+| Direct sync | No | No | Data hits physical disk (no OS page cache) |
+
+Write back is fastest with a small data-loss window on host crash — fine for dev VMs.
+
+Note: Flatcar's kernel has its own page cache independently. With write back, both layers cache:
+
+```
+Flatcar app → Flatcar kernel page cache → host kernel cache → physical disk
+```
+
 ### CPU
 | Field | Value |
 |-------|-------|
