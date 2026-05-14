@@ -103,6 +103,10 @@ qm start $VM_ID
 
 UI "Import Disk" keeps the original format (stays at 400 MB). LVM storage may not boot from a thin qcow2 file. **Prefer CLI import for `local-lvm`.**
 
+## UI and CLI Disk Operations Are Incompatible
+
+Once you import a disk via CLI, do **all** subsequent disk operations (attach, detach, resize) via CLI too. Using the UI to attach or modify a CLI-imported disk can silently zero out the disk contents — leaving an empty volume with no partition table and nothing to boot from.
+
 ## UEFI / EFI Boot
 
 The `efidisk0` added in step-1 is the NVRAM storage — it starts empty.
