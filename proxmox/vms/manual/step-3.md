@@ -24,15 +24,15 @@ Skip the ISO installer entirely. Import a pre-built disk image, configure via cl
 | **Platform-specific** | `flatcar_production_proxmoxve_image.img` | Drivers and config pre-tuned for Proxmox | Flatcar on Proxmox |
 
 **Preference order:**
-1. Platform-specific image if the distro ships one (Flatcar does for Proxmox) ← use this
-2. Cloud image otherwise (Ubuntu, Debian)
-3. Generic QEMU — last resort, everything must be configured manually
+1. Cloud image (Ubuntu, Debian) — QEMU + cloud-init pre-installed ← use this
+2. Generic QEMU image — works on any KVM hypervisor
+3. Platform-specific (Proxmox) — avoid; more vendor lock-in, no real benefit on KVM
 
 ---
 
-## Option A: Generic QEMU Image (any distro)
+## Option A: Generic QEMU Image (any distro) ★
 
-Use this for Ubuntu, Debian, Alpine, etc.
+Use this for Ubuntu, Debian, Alpine, Flatcar, etc.
 
 ### Via UI
 
@@ -92,15 +92,15 @@ qm start $VM_ID
 
 ---
 
-## Option B: Proxmox-Specific Flatcar Image ★
+## Option B: QEMU Flatcar Image
 
-Flatcar ships a purpose-built Proxmox image — no SCSI/VGA tweaks needed, works out of the box.
+Use `flatcar_production_qemu_image.img` — the generic QEMU build. Works on any KVM hypervisor without Proxmox-specific tuning.
 
 ### Via UI
 
 **1. Download**
 
-`local` storage → **Import** → **Download from URL** → paste the Flatcar Proxmox image URL → Download.
+`local` storage → **Import** → **Download from URL** → paste the Flatcar QEMU image URL → Download.
 
 **2. Create VM**
 
@@ -149,10 +149,13 @@ qm create $VM_ID \
   --cores 2 \
   --memory 2048 \
   --net0 "virtio,bridge=vmbr0" \
-  --ipconfig0 "ip=dhcp"
+  --ipconfig0 "ip=dhcp" \
+  --serial0 socket \
+  --vga serial0
 
-qm disk import $VM_ID flatcar_production_proxmoxve_image.img local-lvm
+qm disk import $VM_ID flatcar_production_qemu_image.img local-lvm
 qm set $VM_ID --scsi0 local-lvm:vm-$VM_ID-disk-0
+qm set $VM_ID --scsihw virtio-scsi-pci
 qm set $VM_ID --boot order=scsi0
 qm set $VM_ID --ide2 local-lvm:cloudinit
 qm start $VM_ID
@@ -160,10 +163,16 @@ qm start $VM_ID
 
 ---
 
+## UI Import vs CLI Import — Disk Size
+
+`qm disk import` (CLI) converts the source image to raw format and expands it to the full virtual disk size (e.g. 400 MB qcow2 → 12 GB raw). This is correct for `local-lvm`, which is an LVM thin pool expecting raw volumes.
+
+UI "Import Disk" keeps the original format (stays at 400 MB). LVM storage may not boot from a thin qcow2 file. **Prefer CLI import for `local-lvm`.**
+
 ## `qm disk import` vs `qm importdisk`
 
 `qm disk import` is the current command. `qm importdisk` is deprecated — don't use it.
 
 ## Ref
 
-https://www.flatcar.org/docs/latest/installing/community-platforms/proxmoxve/
+https://www.flatcar.org/docs/latest/installing/vms/qemu/
