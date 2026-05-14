@@ -103,9 +103,11 @@ qm start $VM_ID
 
 UI "Import Disk" keeps the original format (stays at 400 MB). LVM storage may not boot from a thin qcow2 file. **Prefer CLI import for `local-lvm`.**
 
-## UI and CLI Disk Operations Are Incompatible
+## UI Attach Clears a CLI-Imported Disk
 
-Once you import a disk via CLI, do **all** subsequent disk operations (attach, detach, resize) via CLI too. Using the UI to attach or modify a CLI-imported disk can silently zero out the disk contents — leaving an empty volume with no partition table and nothing to boot from.
+After `qm disk import`, **attach the disk via CLI** (`qm set --scsi0`). Using the UI to attach a CLI-imported disk silently zeros out its contents — leaving an empty volume with no partition table and nothing to boot from.
+
+Other UI operations (boot order, SCSI controller, hardware settings) are fine after a CLI import.
 
 ## UEFI / EFI Boot
 
