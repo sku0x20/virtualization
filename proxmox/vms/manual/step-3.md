@@ -113,6 +113,20 @@ After first boot, the bootloader writes a proper entry to NVRAM via `efibootmgr`
 
 No manual EFI setup needed for cloud images.
 
+**Troubleshooting: `failed to load boot0002 "UEFI QEMU QEMU HARDDISK"`**
+
+Stale NVRAM entry — the efidisk0 has a boot path that no longer resolves (happens after re-importing the OS disk or changing disk IDs). Fix: zero the first 1 MB of the EFI disk to clear NVRAM, forcing UEFI back to the fallback scan:
+
+```bash
+# find the efidisk path
+qm config $VM_ID | grep efidisk
+# e.g. efidisk0: local-lvm:vm-101-disk-0,...
+
+dd if=/dev/zero of=/dev/pve/vm-$VM_ID-disk-0 bs=1M count=1
+```
+
+Start the VM — UEFI re-scans, boots from the cloud image's `BOOTX64.EFI`, and writes a fresh NVRAM entry.
+
 ## `qm disk import` vs `qm importdisk`
 
 `qm disk import` is the current command. `qm importdisk` is deprecated — don't use it.
