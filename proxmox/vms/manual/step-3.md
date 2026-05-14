@@ -103,6 +103,16 @@ qm start $VM_ID
 
 UI "Import Disk" keeps the original format (stays at 400 MB). LVM storage may not boot from a thin qcow2 file. **Prefer CLI import for `local-lvm`.**
 
+## UEFI / EFI Boot
+
+The `efidisk0` added in step-1 is the NVRAM storage — it starts empty.
+
+On first boot, UEFI uses a fallback: scans all partitions for `/EFI/BOOT/BOOTX64.EFI`. Cloud images always ship this file, so the VM boots even with empty NVRAM.
+
+After first boot, the bootloader writes a proper entry to NVRAM via `efibootmgr`. Subsequent boots use that entry directly.
+
+No manual EFI setup needed for cloud images.
+
 ## `qm disk import` vs `qm importdisk`
 
 `qm disk import` is the current command. `qm importdisk` is deprecated — don't use it.
