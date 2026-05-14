@@ -38,25 +38,36 @@ Skip the ISO installer entirely. Import a pre-built disk image, configure via cl
 
 Follow the step-1 wizard. In the OS step, select **Do not use any media**.
 
-**3. Attach Disk**
+**3. Add Serial Port + Set Display**
 
-VM → **Hardware** → **Add** → **Import Disk** → select the downloaded image → Storage: `local-lvm` → **Import**.
+VM → **Hardware** → **Add** → **Serial Port** → Port Number: `0` → **OK**.
 
-The disk appears as Unused Disk 0. Click it → **Edit** → confirm it's on `scsi0`.
+VM → **Hardware** → **Display** → Edit → Graphic card: **Serial terminal 0** → **OK**.
 
-**4. Set Boot Order**
+**4. Attach Disk**
+
+UI import leaves the disk as thin qcow2, which may not boot on `local-lvm`. Use CLI for this step:
+
+```bash
+# path where UI-downloaded images land on the Proxmox node
+qm disk import $VM_ID /var/lib/vz/images/<filename>.img local-lvm
+qm set $VM_ID --scsi0 local-lvm:vm-$VM_ID-disk-0
+qm set $VM_ID --scsihw virtio-scsi-pci
+```
+
+**5. Set Boot Order**
 
 VM → **Options** → **Boot Order** → enable `scsi0`, disable others.
 
-**5. Add Cloud-Init Drive**
+**6. Add Cloud-Init Drive**
 
 VM → **Hardware** → **Add** → **CloudInit Drive** → Storage: `local-lvm` → **Add**.
 
-**6. Configure Cloud-Init**
+**7. Configure Cloud-Init**
 
 VM → **Cloud-Init** tab → set SSH key, user, IP (DHCP) → **Regenerate Image**.
 
-**7. Start**
+**8. Start**
 
 VM → **Start** button.
 
