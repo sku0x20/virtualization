@@ -36,7 +36,9 @@ Use this for Ubuntu, Debian, Alpine, etc.
 
 ### 1. Download
 
-On the Proxmox host:
+**Via UI:** `local` storage → **Import** → **Download from URL** → paste the image URL → Download.
+
+Or on the Proxmox host:
 ```bash
 wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
 # or Debian:
@@ -89,6 +91,9 @@ Flatcar ships a purpose-built Proxmox image — no SCSI/VGA tweaks needed, works
 
 ### 1. Download
 
+**Via UI:** `local` storage → **Import** → **Download from URL** → paste the Flatcar Proxmox image URL → Download.
+
+Or on the Proxmox host:
 ```bash
 wget https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img
 ```
