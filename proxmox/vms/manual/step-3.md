@@ -34,18 +34,41 @@ Skip the ISO installer entirely. Import a pre-built disk image, configure via cl
 
 Use this for Ubuntu, Debian, Alpine, etc.
 
-### 1. Download
+### Via UI
 
-**Via UI:** `local` storage → **Import** → **Download from URL** → paste the image URL → Download.
+**1. Download**
 
-Or on the Proxmox host:
-```bash
-wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
-# or Debian:
-wget https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2
-```
+`local` storage → **Import** → **Download from URL** → paste the image URL → Download.
 
-### 2. Create VM
+**2. Create VM**
+
+Follow the step-1 wizard. In the OS step, select **Do not use any media**.
+
+**3. Attach Disk**
+
+VM → **Hardware** → **Add** → **Import Disk** → select the downloaded image → Storage: `local-lvm` → **Import**.
+
+The disk appears as Unused Disk 0. Click it → **Edit** → confirm it's on `scsi0`.
+
+**4. Set Boot Order**
+
+VM → **Options** → **Boot Order** → enable `scsi0`, disable others.
+
+**5. Add Cloud-Init Drive**
+
+VM → **Hardware** → **Add** → **CloudInit Drive** → Storage: `local-lvm` → **Add**.
+
+**6. Configure Cloud-Init**
+
+VM → **Cloud-Init** tab → set SSH key, user, IP (DHCP) → **Regenerate Image**.
+
+**7. Start**
+
+VM → **Start** button.
+
+---
+
+### Via CLI
 
 ```bash
 export VM_ID=101
@@ -58,28 +81,12 @@ qm create $VM_ID \
   --ipconfig0 "ip=dhcp" \
   --serial0 socket \
   --vga serial0
-```
 
-### 3. Import Disk
-
-```bash
 qm disk import $VM_ID noble-server-cloudimg-amd64.img local-lvm
 qm set $VM_ID --scsi0 local-lvm:vm-$VM_ID-disk-0
 qm set $VM_ID --scsihw virtio-scsi-pci
 qm set $VM_ID --boot order=scsi0
-```
-
-### 4. Add Cloud-Init Drive
-
-```bash
 qm set $VM_ID --ide2 local-lvm:cloudinit
-```
-
-Set SSH key, user, IP via UI: VM → **Cloud-Init tab** → Regenerate Image.
-
-### 5. Start
-
-```bash
 qm start $VM_ID
 ```
 
@@ -89,16 +96,50 @@ qm start $VM_ID
 
 Flatcar ships a purpose-built Proxmox image — no SCSI/VGA tweaks needed, works out of the box.
 
-### 1. Download
+### Via UI
 
-**Via UI:** `local` storage → **Import** → **Download from URL** → paste the Flatcar Proxmox image URL → Download.
+**1. Download**
 
-Or on the Proxmox host:
+`local` storage → **Import** → **Download from URL** → paste the Flatcar Proxmox image URL → Download.
+
+**2. Create VM**
+
+Follow the step-1 wizard. In the OS step, select **Do not use any media**.
+
+**3. Attach Disk**
+
+VM → **Hardware** → **Add** → **Import Disk** → select the downloaded Flatcar image → Storage: `local-lvm` → **Import**.
+
+The disk appears as Unused Disk 0. Click it → **Edit** → confirm it's on `scsi0`.
+
+**4. Set Boot Order**
+
+VM → **Options** → **Boot Order** → enable `scsi0`, disable others.
+
+**5. Add Cloud-Init Drive**
+
+VM → **Hardware** → **Add** → **CloudInit Drive** → Storage: `local-lvm` → **Add**.
+
+Required even if using Ignition instead of cloud-init.
+
+**6. Set SSH Key**
+
+VM → **Cloud-Init** tab → paste public key → **Regenerate Image**.
+
+**7. Start**
+
+VM → **Start** button.
+
+**8. SSH In**
+
+Default user on Flatcar is `core`:
 ```bash
-wget https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_proxmoxve_image.img
+ssh core@<vm-ip>
 ```
 
-### 2. Create VM & Import
+---
+
+### Via CLI
 
 ```bash
 export VM_ID=101
@@ -111,27 +152,10 @@ qm create $VM_ID \
   --ipconfig0 "ip=dhcp"
 
 qm disk import $VM_ID flatcar_production_proxmoxve_image.img local-lvm
-
 qm set $VM_ID --scsi0 local-lvm:vm-$VM_ID-disk-0
 qm set $VM_ID --boot order=scsi0
-qm set $VM_ID --ide2 local-lvm:cloudinit   # required even for Ignition
-```
-
-### 3. Set SSH Key
-
-UI: VM → **Cloud-Init tab** → paste public key → **Regenerate Image**
-
-### 4. Start
-
-```bash
+qm set $VM_ID --ide2 local-lvm:cloudinit
 qm start $VM_ID
-```
-
-### 5. SSH In
-
-Default user on Flatcar is `core`:
-```bash
-ssh core@<vm-ip>
 ```
 
 ---
