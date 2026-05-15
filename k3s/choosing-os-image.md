@@ -3,35 +3,40 @@
 ## Requirements
 
 - Lightweight, minimal footprint
-- Immutable (no package manager, container-first)
-- Proxmox-friendly (qcow2 cloud image available)
+- Proxmox-friendly (cloud image available)
 - Works well with k3s
-
-## Candidates
-
-| OS | Image download | Disk (provisioned) | Min RAM | Provisioning |
-|----|---------------|-------------------|---------|-------------|
-| **Flatcar Container Linux** | ~477 MB | ~20 GB | 2 GB | Ignition |
-| **Fedora CoreOS** | varies (compressed) | ~10 GB | 1 GB (2 GB rec) | Ignition |
-| **openSUSE MicroOS** | ~518 MB | not documented | 1 GB | Combustion |
-| **Kairos** | no pre-built qcow2 | 8–40 GB (flavor-dependent) | 2 GB | cloud-init |
-
-## Notes
-
-- **Flatcar** — most mature, strongest k3s community, conservative release cycle
-- **Fedora CoreOS** — smallest provisioned disk, lowest min RAM, but aggressive ~2 week release cycle
-- **openSUSE MicroOS** — transactional package support if needed, shell-script provisioning (easier than Ignition JSON)
-- **Kairos** — pre-bundles k3s, Proxmox docs exist, but newer project and no pre-built qcow2
-
-## Provisioning: Ignition vs cloud-init
-
-Flatcar and CoreOS use **Ignition** — runs in initramfs *before* the OS boots, one-time only. Can inject systemd units, SSH keys, k3s install script before first boot. Different from cloud-init (which runs in userspace after boot).
-
-## K3OS
-
-Rancher built K3OS as a purpose-built OS for k3s. It is now **archived and unmaintained** — do not use.
+- Non-systemd preferred
 
 ## Decision
 
-**Flatcar Container Linux** — host has 8 GB RAM, stability preferred over minimum footprint.
-3-node k3s cluster (1 control + 2 workers) at 2 GB each = 6 GB, leaves ~2 GB for Proxmox host.
+**Alpine Linux**
+
+- Non-systemd (OpenRC) — no bloat
+- ~130 MB base, genuinely minimal
+- k3s installs cleanly, no workarounds needed
+- Fast to boot in a VM
+- Large docs/community for k3s on Alpine
+
+## Why not immutable OS (Flatcar, CoreOS, MicroOS)
+
+Immutable OSes are designed for **ops at scale** — large fleets where you can't trust humans touching nodes, or edge devices you can't physically reach. The benefits are:
+
+- Atomic updates with rollback (no bricking remote devices)
+- Guaranteed identical nodes across a fleet (no config drift)
+- Read-only OS partition (malware can't persist across reboots)
+
+For a homelab k3s cluster on Proxmox, this is overkill. k3s writes binaries, CNI plugins, and config to the OS partition (`/usr/local/bin`, `/etc/rancher`, `/opt/cni/bin`). Immutable OSes make this painful — workarounds exist but add friction to updates, debugging, and adding packages.
+
+## Does kubectl work without systemd?
+
+Yes. kubectl is a CLI that talks to the Kubernetes API over HTTP — it has no dependency on systemd. k3s manages its own process supervision and integrates with OpenRC on Alpine. kubectl works identically regardless of init system.
+
+## Previous candidates considered (dropped)
+
+| OS | Reason dropped |
+|----|----------------|
+| Flatcar Container Linux | Immutable, systemd-based, k3s needs workarounds |
+| Fedora CoreOS | Immutable, systemd, aggressive release cycle |
+| openSUSE MicroOS | Immutable, systemd, transactional-update friction |
+| Kairos | No pre-built qcow2, newer/less mature project |
+| K3OS | Archived and unmaintained by Rancher — do not use |
