@@ -11,6 +11,8 @@ BIOS variant (if not using UEFI):
 https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.4-x86_64-bios-tiny-r0.qcow2
 ```
 
+> The login user is `alpine`. There is no default password — access requires an SSH key injected via cloud-init, NoCloud, or the hypervisor's instance metadata. See `proxmox/vms/step-4.md` for how to set a password via cloud-init.
+
 ## Prerequisites
 
 ### 1. Required packages
