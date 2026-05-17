@@ -37,13 +37,23 @@ users:
 ssh_pwauth: true
 ```
 
-Generate the hashed password on any Linux machine:
+Linux never stores plain passwords — it stores a hash. Cloud-init follows the same convention: the `passwd:` field expects an already-hashed value, which it writes directly into `/etc/shadow` on the VM.
+
+Generate the hash on any Linux machine:
 
 ```bash
 openssl passwd -6
+# type your password when prompted
+# outputs: $6$somesalt$longhashstring...
 ```
 
-Paste the output as the `passwd` value.
+Paste the entire output as the `passwd` value. The format is:
+
+- `$6$` — SHA-512 algorithm
+- `somesalt$` — random salt (generated automatically)
+- `longhashstring` — the resulting hash
+
+> Using `plain_text_passwd` instead is possible but not recommended — it leaves your password in plain text in the snippet file on the Proxmox host.
 
 ### 3. Point the VM at the snippet
 
