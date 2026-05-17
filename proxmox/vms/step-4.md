@@ -47,9 +47,9 @@ openssl passwd -6
 # outputs: $6$somesalt$longhashstring...
 ```
 
-Paste the entire output as the `passwd` value. The format is:
+Paste the entire output as the `passwd` value. The format is **crypt(3)** — a Unix standard that PAM and `/etc/shadow` understand natively:
 
-- `$6$` — SHA-512 algorithm
+- `$6$` — algorithm (`$1$` MD5, `$5$` SHA-256, `$6$` SHA-512, `$y$` yescrypt)
 - `somesalt$` — random salt (generated automatically)
 - `longhashstring` — the resulting hash
 
