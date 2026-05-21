@@ -4,5 +4,7 @@ users:
   - name: alpine
     plain_text_passwd: "alpine"
     lock_passwd: false
+    doas:
+      - "permit nopass alpine"
 
 ssh_pwauth: false
