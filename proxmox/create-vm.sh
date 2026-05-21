@@ -61,8 +61,7 @@ qm create "$VM_ID" \
   --balloon 1 \
   --net0 "virtio,bridge=vmbr0" \
   --ipconfig0 "ip=dhcp" \
-  --serial0 socket \
-  --vga serial0
+  --serial0 socket
 
 qm set "$VM_ID" --efidisk0 "${STORAGE}:1,efitype=4m,pre-enrolled-keys=0"
 
