@@ -10,6 +10,7 @@ usage() {
   echo "  -s  Proxmox storage (default: local-lvm)"
   echo "  -c  vCPU cores (default: 2)"
   echo "  -m  RAM in MB (default: 2048)"
+  echo "  -u  Path to custom user-data snippet (optional; copied to /var/lib/vz/snippets/)"
   exit 1
 }
 
@@ -19,8 +20,9 @@ VM_ID=""
 STORAGE="local-lvm"
 CORES=2
 MEMORY=2048
+USERDATA_PATH=""
 
-while getopts "n:i:d:s:c:m:h" opt; do
+while getopts "n:i:d:s:c:m:u:h" opt; do
   case $opt in
     n) VM_NAME="$OPTARG" ;;
     i) IMAGE_PATH="$OPTARG" ;;
@@ -28,6 +30,7 @@ while getopts "n:i:d:s:c:m:h" opt; do
     s) STORAGE="$OPTARG" ;;
     c) CORES="$OPTARG" ;;
     m) MEMORY="$OPTARG" ;;
+    u) USERDATA_PATH="$OPTARG" ;;
     h) usage ;;
     *) usage ;;
   esac
@@ -36,6 +39,7 @@ done
 [[ -z "$VM_NAME" ]] && { echo "Error: VM name is required (-n)"; usage; }
 [[ -z "$IMAGE_PATH" ]] && { echo "Error: Image path is required (-i)"; usage; }
 [[ ! -f "$IMAGE_PATH" ]] && { echo "Error: Image not found: $IMAGE_PATH"; exit 1; }
+[[ -n "$USERDATA_PATH" && ! -f "$USERDATA_PATH" ]] && { echo "Error: User-data file not found: $USERDATA_PATH"; exit 1; }
 
 # pick next available VM ID if not specified
 if [[ -z "$VM_ID" ]]; then
@@ -68,5 +72,12 @@ qm set "$VM_ID" --scsihw virtio-scsi-pci
 qm set "$VM_ID" --boot order=scsi0
 
 qm set "$VM_ID" --ide2 "${STORAGE}:cloudinit"
+
+if [[ -n "$USERDATA_PATH" ]]; then
+  SNIPPET_NAME="user-data-${VM_ID}.yaml"
+  cp "$USERDATA_PATH" "/var/lib/vz/snippets/${SNIPPET_NAME}"
+  qm set "$VM_ID" --cicustom "user=local:snippets/${SNIPPET_NAME}"
+  qm cloudinit update "$VM_ID"
+fi
 
 echo "VM $VM_ID ($VM_NAME) created. Start with: qm start $VM_ID"
