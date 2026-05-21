@@ -34,6 +34,7 @@ write_files:
       net.ipv4.ip_forward = 1
 
 runcmd:
+  # virt kernel has CONFIG_MEMCG=y (cgroup v2 only); "Failed to find memory cgroup" from k3s is noise
   - modprobe br_netfilter
   - modprobe overlay
   - modprobe ip_tables
