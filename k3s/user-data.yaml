@@ -7,4 +7,9 @@ users:
     doas:
       - "permit nopass alpine"
 
+chpasswd:
+  list:
+    - root:root
+  expire: false
+
 ssh_pwauth: false
