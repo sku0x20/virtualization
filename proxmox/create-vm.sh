@@ -10,7 +10,7 @@ usage() {
   echo "  -s  Proxmox storage (default: local-lvm)"
   echo "  -c  vCPU cores (default: 2)"
   echo "  -m  RAM in MB (default: 2048)"
-  echo "  -u  Snippet filename in /var/lib/vz/snippets/ (optional, e.g. user-data.yaml)"
+  echo "  -u  Snippet filename in /var/lib/vz/snippets/ (optional, e.g. user-data.yaml) — passed as vendor config so Proxmox still injects hostname"
   exit 1
 }
 
@@ -75,7 +75,7 @@ qm set "$VM_ID" --boot order=scsi0
 qm set "$VM_ID" --ide2 "${STORAGE}:cloudinit"
 
 if [[ -n "$USERDATA_PATH" ]]; then
-  qm set "$VM_ID" --cicustom "user=local:snippets/${USERDATA_PATH}"
+  qm set "$VM_ID" --cicustom "vendor=local:snippets/${USERDATA_PATH}"
   qm cloudinit update "$VM_ID"
 fi
 
