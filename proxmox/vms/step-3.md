@@ -92,6 +92,7 @@ qm set $VM_ID --scsi0 local-lvm:vm-$VM_ID-disk-0
 qm set $VM_ID --scsihw virtio-scsi-pci
 qm set $VM_ID --boot order=scsi0
 qm set $VM_ID --ide2 local-lvm:cloudinit
+qm resize $VM_ID scsi0 +10G
 qm start $VM_ID
 ```
 
