@@ -19,7 +19,7 @@ ssh_pwauth: false
 packages:
   - curl
   - bash
-  - iptables
+  - iptables-legacy
 
 write_files:
   - path: /etc/modules-load.d/k3s.conf
