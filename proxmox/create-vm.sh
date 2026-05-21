@@ -5,7 +5,7 @@ usage() {
   echo "Usage: $0 -n <vm-name> -i <image-path> [-d <vm-id>] [-s <storage>] [-c <cores>] [-m <memory-mb>] [-u <snippet-filename>] [-k <k3s-token>] [-p <server-ip>]"
   echo ""
   echo "  -n  VM name (required)"
-  echo "  -i  Path to disk image to import (required)"
+  echo "  -i  Disk image to import — bare filename resolves from /var/lib/vz/import/, ./ for relative, / for absolute"
   echo "  -d  VM ID (default: next available starting at 100)"
   echo "  -s  Proxmox storage (default: local-lvm)"
   echo "  -c  vCPU cores (default: 2)"
@@ -44,6 +44,10 @@ done
 
 [[ -z "$VM_NAME" ]] && { echo "Error: VM name is required (-n)"; usage; }
 [[ -z "$IMAGE_PATH" ]] && { echo "Error: Image path is required (-i)"; usage; }
+
+# bare filename → resolve relative to /var/lib/vz/import/
+[[ "$IMAGE_PATH" != /* && "$IMAGE_PATH" != ./* && "$IMAGE_PATH" != ../* ]] && IMAGE_PATH="/var/lib/vz/import/${IMAGE_PATH}"
+
 [[ ! -f "$IMAGE_PATH" ]] && { echo "Error: Image not found: $IMAGE_PATH"; exit 1; }
 [[ -n "$USERDATA_PATH" && ! -f "/var/lib/vz/snippets/$USERDATA_PATH" ]] && { echo "Error: Snippet not found: /var/lib/vz/snippets/$USERDATA_PATH"; exit 1; }
 
