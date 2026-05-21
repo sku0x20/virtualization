@@ -10,7 +10,7 @@ usage() {
   echo "  -s  Proxmox storage (default: local-lvm)"
   echo "  -c  vCPU cores (default: 2)"
   echo "  -m  RAM in MB (default: 2048)"
-  echo "  -u  Path to custom user-data snippet (optional; copied to /var/lib/vz/snippets/)"
+  echo "  -u  Snippet filename in /var/lib/vz/snippets/ (optional, e.g. user-data.yaml)"
   exit 1
 }
 
@@ -39,7 +39,7 @@ done
 [[ -z "$VM_NAME" ]] && { echo "Error: VM name is required (-n)"; usage; }
 [[ -z "$IMAGE_PATH" ]] && { echo "Error: Image path is required (-i)"; usage; }
 [[ ! -f "$IMAGE_PATH" ]] && { echo "Error: Image not found: $IMAGE_PATH"; exit 1; }
-[[ -n "$USERDATA_PATH" && ! -f "$USERDATA_PATH" ]] && { echo "Error: User-data file not found: $USERDATA_PATH"; exit 1; }
+[[ -n "$USERDATA_PATH" && ! -f "/var/lib/vz/snippets/$USERDATA_PATH" ]] && { echo "Error: Snippet not found: /var/lib/vz/snippets/$USERDATA_PATH"; exit 1; }
 
 # pick next available VM ID if not specified
 if [[ -z "$VM_ID" ]]; then
@@ -74,9 +74,7 @@ qm set "$VM_ID" --boot order=scsi0
 qm set "$VM_ID" --ide2 "${STORAGE}:cloudinit"
 
 if [[ -n "$USERDATA_PATH" ]]; then
-  SNIPPET_NAME="user-data-${VM_ID}.yaml"
-  cp "$USERDATA_PATH" "/var/lib/vz/snippets/${SNIPPET_NAME}"
-  qm set "$VM_ID" --cicustom "user=local:snippets/${SNIPPET_NAME}"
+  qm set "$VM_ID" --cicustom "user=local:snippets/${USERDATA_PATH}"
   qm cloudinit update "$VM_ID"
 fi
 
