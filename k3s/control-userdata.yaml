@@ -19,7 +19,7 @@ ssh_pwauth: false
 packages:
   - curl
   - bash
-  - iptables-legacy
+  - iptables
 
 write_files:
   - path: /etc/modules-load.d/k3s.conf
@@ -27,6 +27,7 @@ write_files:
       br_netfilter
       overlay
       ip_tables
+      nf_tables
   - path: /etc/sysctl.d/k3s.conf
     content: |
       net.bridge.bridge-nf-call-iptables = 1
@@ -38,6 +39,7 @@ runcmd:
   - modprobe br_netfilter
   - modprobe overlay
   - modprobe ip_tables
+  - modprobe nf_tables
   - sysctl -p /etc/sysctl.d/k3s.conf
   - swapoff -a
   - sed -i '/ swap / d' /etc/fstab
