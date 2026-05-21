@@ -1,0 +1,30 @@
+#cloud-config
+
+packages:
+  - curl
+  - bash
+  - iptables
+
+write_files:
+  - path: /etc/modules-load.d/k3s.conf
+    content: |
+      br_netfilter
+      overlay
+      ip_tables
+  - path: /etc/sysctl.d/k3s.conf
+    content: |
+      net.bridge.bridge-nf-call-iptables = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.ipv4.ip_forward = 1
+
+runcmd:
+  - modprobe br_netfilter
+  - modprobe overlay
+  - modprobe ip_tables
+  - sysctl -p /etc/sysctl.d/k3s.conf
+  - swapoff -a
+  - sed -i '/ swap / d' /etc/fstab
+  - curl -sfL https://get.k3s.io | K3S_URL=%%K3S_URL%% K3S_TOKEN=%%K3S_TOKEN%% sh -
+
+power_state:
+  mode: reboot
