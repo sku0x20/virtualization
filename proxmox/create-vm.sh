@@ -68,6 +68,8 @@ qm set "$VM_ID" --efidisk0 "${STORAGE}:1,efitype=4m,pre-enrolled-keys=0"
 qm disk import "$VM_ID" "$IMAGE_PATH" "$STORAGE"
 qm set "$VM_ID" --scsi0 "${STORAGE}:vm-${VM_ID}-disk-1"
 
+qm resize "$VM_ID" scsi0 +10G
+
 qm set "$VM_ID" --boot order=scsi0
 
 qm set "$VM_ID" --ide2 "${STORAGE}:cloudinit"
