@@ -3,15 +3,12 @@
 ## Cloud Image
 
 ```
-https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/cloud/generic_alpine-3.23.4-x86_64-uefi-tiny-r0.qcow2
+https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/generic_alpine-3.23.4-x86_64-uefi-cloudinit-r0.qcow2
 ```
 
-BIOS variant (if not using UEFI):
-```
-https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/nocloud_alpine-3.23.4-x86_64-bios-tiny-r0.qcow2
-```
+> **Cloud-init caveat:** Alpine's tiny-cloud implementation only supports a subset of cloud-init. Setting a password via cloud-init user-data (`chpasswd`, `password:`) is **not supported** — access requires an SSH key. Use `proxmox/vms/step-4.md` to inject one via Proxmox's cloud-init UI.
 
-> The login user is `alpine`. There is no default password — access requires an SSH key injected via cloud-init, NoCloud, or the hypervisor's instance metadata. See `proxmox/vms/step-4.md` for how to set a password via cloud-init.
+> The login user is `alpine`. There is no default password — SSH key required.
 
 ## Prerequisites
 
