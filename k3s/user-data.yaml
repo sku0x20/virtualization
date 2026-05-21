@@ -35,7 +35,7 @@ write_files:
 runcmd:
   - modprobe br_netfilter
   - modprobe overlay
-  - modprobe ip_tables || true
+  - modprobe ip_tables
   - sysctl -p /etc/sysctl.d/k3s.conf
   - swapoff -a
   - sed -i '/ swap / d' /etc/fstab
