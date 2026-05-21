@@ -58,23 +58,19 @@ qm create "$VM_ID" \
   --machine q35 \
   --bios ovmf \
   --cpu host \
-  --balloon 1 \
   --net0 "virtio,bridge=vmbr0" \
   --ipconfig0 "ip=dhcp" \
+  --scsihw virtio-scsi-pci \
   --serial0 socket
 
 qm set "$VM_ID" --efidisk0 "${STORAGE}:1,efitype=4m,pre-enrolled-keys=0"
 
 qm disk import "$VM_ID" "$IMAGE_PATH" "$STORAGE"
 qm set "$VM_ID" --scsi0 "${STORAGE}:vm-${VM_ID}-disk-1"
-qm set "$VM_ID" --scsihw virtio-scsi-pci
-qm resize "$VM_ID" scsi0 +2G
-# after resize the backup GPT is no longer at the last LBA; move it so UEFI can boot
-sgdisk -e "$(pvesm path "${STORAGE}:vm-${VM_ID}-disk-1")"
+
 qm set "$VM_ID" --boot order=scsi0
 
 qm set "$VM_ID" --ide2 "${STORAGE}:cloudinit"
-
 
 if [[ -n "$USERDATA_PATH" ]]; then
   qm set "$VM_ID" --cicustom "user=local:snippets/${USERDATA_PATH}"
