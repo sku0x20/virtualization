@@ -8,8 +8,10 @@ users:
       - "permit nopass alpine"
 
 chpasswd:
-  list:
-    - root:root
+  users:
+    - name: root
+      password: root
+      type: text
   expire: false
 
 ssh_pwauth: false
