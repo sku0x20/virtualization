@@ -1,5 +1,21 @@
 #cloud-config
 
+users:
+  - name: alpine
+    plain_text_passwd: "alpine"
+    lock_passwd: false
+    doas:
+      - "permit nopass alpine"
+
+chpasswd:
+  users:
+    - name: root
+      password: root
+      type: text
+  expire: false
+
+ssh_pwauth: false
+
 packages:
   - curl
   - bash
