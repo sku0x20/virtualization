@@ -1,0 +1,8 @@
+#cloud-config
+
+users:
+  - name: alpine
+    hashed_passwd: "$6$q6xXARB0BXLrkhFm$lEmYa.5x8ysuMK38x7vh2zwUebH3k4vfsLifvS5x6TJjZiiSNjtQ5AAIR0HgDnBuzX3wNNvDlPTChtwFTKQSD/"
+    lock_passwd: false
+
+ssh_pwauth: false
