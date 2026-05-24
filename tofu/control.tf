@@ -4,7 +4,7 @@ resource "proxmox_virtual_environment_file" "control_userdata" {
   datastore_id = "local"
 
   source_raw {
-    data      = templatefile("${path.module}/userdata/control.yaml.tftpl", {})
+    data      = templatefile("${path.module}/userdata/control.yaml.tftpl", { k3s_token = var.k3s_token })
     file_name = "k3s-control-vendor.yaml"
   }
 }
