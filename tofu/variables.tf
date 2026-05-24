@@ -21,10 +21,9 @@ variable "storage" {
   default     = "local-lvm"
 }
 
-variable "alpine_image_url" {
-  description = "URL to an Alpine Linux UEFI cloud image (qcow2/img)"
+variable "alpine_image_id" {
+  description = "Proxmox storage path to the Alpine cloud image, e.g. local:iso/alpine-cloud.qcow2"
   type        = string
-  default     = "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/nocloud_alpine-3.21.3-x86_64-uefi-cloudinit-r0.qcow2"
 }
 
 variable "k3s_token" {

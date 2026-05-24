@@ -41,7 +41,7 @@ resource "proxmox_virtual_environment_vm" "control" {
 
   disk {
     datastore_id = var.storage
-    file_id      = proxmox_virtual_environment_download_url.alpine.id
+    file_id      = var.alpine_image_id
     interface    = "scsi0"
     size         = 12
     file_format  = "raw"
