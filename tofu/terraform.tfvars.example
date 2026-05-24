@@ -2,5 +2,6 @@ proxmox_endpoint  = "https://192.168.1.x:8006/"
 proxmox_api_token = "root@pam!tofu=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 proxmox_node      = "pve"
 storage           = "local-lvm"
+# openssl rand -hex 32
 k3s_token         = "your-secret-token"
 agent_count       = 2
