@@ -4,4 +4,3 @@ proxmox_node      = "pve"
 storage           = "local-lvm"
 # openssl rand -hex 32
 k3s_token         = "your-secret-token"
-agent_count       = 2

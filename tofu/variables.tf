@@ -36,18 +36,18 @@ variable "k3s_token" {
 variable "agent_count" {
   description = "Number of k3s agent nodes"
   type        = number
-  default     = 2
+  default     =  3
 }
 
 variable "control_cores" {
   type    = number
-  default = 2
+  default = 1
 }
 
 variable "control_memory" {
   description = "RAM in MB for control plane"
   type        = number
-  default     = 2048
+  default     = 1024
 }
 
 variable "agent_cores" {
