@@ -1,0 +1,158 @@
+# Download the Alpine cloud image to Proxmox local storage once.
+# Proxmox imports it into the VM disk on first use.
+resource "proxmox_virtual_environment_download_url" "alpine" {
+  node_name    = var.proxmox_node
+  content_type = "iso"
+  datastore_id = "local"
+  url          = var.alpine_image_url
+  file_name    = "alpine-cloud.qcow2"
+}
+
+# Upload control-plane cloud-init vendor snippet
+resource "proxmox_virtual_environment_file" "control_userdata" {
+  node_name    = var.proxmox_node
+  content_type = "snippets"
+  datastore_id = "local"
+
+  source_raw {
+    data      = templatefile("${path.module}/userdata/control.yaml.tftpl", {})
+    file_name = "k3s-control-vendor.yaml"
+  }
+}
+
+resource "proxmox_virtual_environment_vm" "control" {
+  name      = "k3s-control"
+  node_name = var.proxmox_node
+  started   = true
+
+  machine = "q35"
+  bios    = "ovmf"
+
+  cpu {
+    cores = var.control_cores
+    type  = "host"
+  }
+
+  memory {
+    dedicated = var.control_memory
+  }
+
+  network_device {
+    bridge = "vmbr0"
+    model  = "virtio"
+  }
+
+  scsi_hardware = "virtio-scsi-pci"
+
+  efi_disk {
+    datastore_id      = var.storage
+    type              = "4m"
+    pre_enrolled_keys = false
+  }
+
+  disk {
+    datastore_id = var.storage
+    file_id      = proxmox_virtual_environment_download_url.alpine.id
+    interface    = "scsi0"
+    size         = 12
+    file_format  = "raw"
+  }
+
+  serial_device {}
+
+  boot_order = ["scsi0"]
+
+  # qemu-guest-agent installed via cloud-init; Tofu polls until it responds
+  # so it can read the DHCP IP before creating agent snippet/VMs.
+  agent {
+    enabled = true
+    timeout = "15m"
+  }
+
+  initialization {
+    vendor_data_file_id = proxmox_virtual_environment_file.control_userdata.id
+    ip_config {
+      ipv4 {
+        address = "dhcp"
+      }
+    }
+  }
+}
+
+locals {
+  # ipv4_addresses: [[loopback IPs], [eth0 IPs], ...]
+  control_ip = proxmox_virtual_environment_vm.control.ipv4_addresses[1][0]
+}
+
+# Upload agent cloud-init vendor snippet, rendered with the control plane IP
+resource "proxmox_virtual_environment_file" "agent_userdata" {
+  node_name    = var.proxmox_node
+  content_type = "snippets"
+  datastore_id = "local"
+
+  source_raw {
+    data = templatefile("${path.module}/userdata/agent.yaml.tftpl", {
+      k3s_url   = "https://${local.control_ip}:6443"
+      k3s_token = var.k3s_token
+    })
+    file_name = "k3s-agent-vendor.yaml"
+  }
+}
+
+resource "proxmox_virtual_environment_vm" "agent" {
+  count     = var.agent_count
+  name      = "k3s-agent-${count.index + 1}"
+  node_name = var.proxmox_node
+  started   = true
+
+  machine = "q35"
+  bios    = "ovmf"
+
+  cpu {
+    cores = var.agent_cores
+    type  = "host"
+  }
+
+  memory {
+    dedicated = var.agent_memory
+  }
+
+  network_device {
+    bridge = "vmbr0"
+    model  = "virtio"
+  }
+
+  scsi_hardware = "virtio-scsi-pci"
+
+  efi_disk {
+    datastore_id      = var.storage
+    type              = "4m"
+    pre_enrolled_keys = false
+  }
+
+  disk {
+    datastore_id = var.storage
+    file_id      = proxmox_virtual_environment_download_url.alpine.id
+    interface    = "scsi0"
+    size         = 12
+    file_format  = "raw"
+  }
+
+  serial_device {}
+
+  boot_order = ["scsi0"]
+
+  agent {
+    enabled = true
+    timeout = "15m"
+  }
+
+  initialization {
+    vendor_data_file_id = proxmox_virtual_environment_file.agent_userdata.id
+    ip_config {
+      ipv4 {
+        address = "dhcp"
+      }
+    }
+  }
+}

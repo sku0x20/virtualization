@@ -1,0 +1,62 @@
+variable "proxmox_endpoint" {
+  description = "Proxmox API endpoint, e.g. https://192.168.1.x:8006/"
+  type        = string
+}
+
+variable "proxmox_api_token" {
+  description = "API token in the form USER@REALM!TOKENID=UUID, e.g. root@pam!tofu=xxxxxxxx-..."
+  type        = string
+  sensitive   = true
+}
+
+variable "proxmox_node" {
+  description = "Proxmox node name (shown in the web UI under Datacenter)"
+  type        = string
+  default     = "pve"
+}
+
+variable "storage" {
+  description = "Proxmox storage for VM disks"
+  type        = string
+  default     = "local-lvm"
+}
+
+variable "alpine_image_url" {
+  description = "URL to an Alpine Linux UEFI cloud image (qcow2/img)"
+  type        = string
+  default     = "https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/cloud/nocloud_alpine-3.21.3-x86_64-uefi-cloudinit-r0.qcow2"
+}
+
+variable "k3s_token" {
+  description = "Shared secret for k3s cluster join"
+  type        = string
+  sensitive   = true
+}
+
+variable "agent_count" {
+  description = "Number of k3s agent nodes"
+  type        = number
+  default     = 2
+}
+
+variable "control_cores" {
+  type    = number
+  default = 2
+}
+
+variable "control_memory" {
+  description = "RAM in MB for control plane"
+  type        = number
+  default     = 2048
+}
+
+variable "agent_cores" {
+  type    = number
+  default = 2
+}
+
+variable "agent_memory" {
+  description = "RAM in MB for each agent"
+  type        = number
+  default     = 2048
+}

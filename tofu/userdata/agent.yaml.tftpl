@@ -1,0 +1,51 @@
+#cloud-config
+
+users:
+  - name: alpine
+    plain_text_passwd: "alpine"
+    lock_passwd: false
+    doas:
+      - "permit nopass alpine"
+
+chpasswd:
+  users:
+    - name: root
+      password: root
+      type: text
+  expire: false
+
+ssh_pwauth: false
+
+packages:
+  - curl
+  - bash
+  - iptables
+  - qemu-guest-agent
+
+write_files:
+  - path: /etc/modules-load.d/k3s.conf
+    content: |
+      br_netfilter
+      overlay
+      ip_tables
+      nf_tables
+  - path: /etc/sysctl.d/k3s.conf
+    content: |
+      net.bridge.bridge-nf-call-iptables = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.ipv4.ip_forward = 1
+
+runcmd:
+  - modprobe br_netfilter
+  - modprobe overlay
+  - modprobe ip_tables
+  - modprobe nf_tables
+  - sysctl -p /etc/sysctl.d/k3s.conf
+  - swapoff -a
+  - sed -i '/ swap / d' /etc/fstab
+  - rc-update add qemu-guest-agent default
+  - rc-service qemu-guest-agent start
+  - curl -sfL https://get.k3s.io | K3S_URL=${k3s_url} K3S_TOKEN=${k3s_token} sh -
+
+power_state:
+  mode: reboot
