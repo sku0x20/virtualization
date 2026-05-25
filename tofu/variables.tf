@@ -9,6 +9,12 @@ variable "proxmox_api_token" {
   sensitive   = true
 }
 
+variable "proxmox_ssh_username" {
+  description = "SSH username for Proxmox host (used for snippet uploads)"
+  type        = string
+  default     = "root"
+}
+
 variable "proxmox_node" {
   description = "Proxmox node name (shown in the web UI under Datacenter)"
   type        = string
