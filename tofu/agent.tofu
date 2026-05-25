@@ -45,7 +45,7 @@ resource "proxmox_virtual_environment_vm" "agent" {
 
   disk {
     datastore_id = var.storage
-    file_id      = var.alpine_image_id
+    import_from  = var.alpine_image_id
     interface    = "scsi0"
     size         = 12
     file_format  = "raw"
