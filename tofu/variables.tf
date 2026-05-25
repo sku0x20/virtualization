@@ -15,6 +15,12 @@ variable "proxmox_ssh_username" {
   default     = "root"
 }
 
+variable "proxmox_ssh_private_key" {
+  description = "PEM-encoded SSH private key for Proxmox host (used for snippet uploads)"
+  type        = string
+  sensitive   = true
+}
+
 variable "proxmox_node" {
   description = "Proxmox node name (shown in the web UI under Datacenter)"
   type        = string

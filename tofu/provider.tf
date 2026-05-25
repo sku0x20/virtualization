@@ -13,7 +13,7 @@ provider "proxmox" {
   insecure  = false
 
   ssh {
-    agent    = true
-    username = var.proxmox_ssh_username
+    username    = var.proxmox_ssh_username
+    private_key = var.proxmox_ssh_private_key
   }
 }
