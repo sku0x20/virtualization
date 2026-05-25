@@ -70,7 +70,7 @@ variable "control_memory" {
 
 variable "agent_cores" {
   type    = number
-  default = 2
+  default = 1
 }
 
 variable "agent_memory" {
