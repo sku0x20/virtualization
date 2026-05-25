@@ -15,10 +15,10 @@ variable "proxmox_ssh_username" {
   default     = "root"
 }
 
-variable "proxmox_ssh_private_key" {
-  description = "PEM-encoded SSH private key for Proxmox host (used for snippet uploads)"
+variable "proxmox_ssh_private_key_path" {
+  description = "Path to the SSH private key file for Proxmox host (used for snippet uploads)"
   type        = string
-  sensitive   = true
+  default     = "~/.ssh/proxmox_tofu"
 }
 
 variable "proxmox_node" {
