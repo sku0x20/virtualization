@@ -25,7 +25,7 @@ resource "proxmox_virtual_environment_vm" "control" {
 
   memory {
     dedicated = var.control_memory
-    floating  = var.control_memory_balloon
+    floating  = var.control_memory
   }
 
   network_device {

@@ -29,7 +29,7 @@ resource "proxmox_virtual_environment_vm" "agent" {
 
   memory {
     dedicated = var.agent_memory
-    floating  = var.agent_memory_balloon
+    floating  = var.agent_memory
   }
 
   network_device {
