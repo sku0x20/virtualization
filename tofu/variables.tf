@@ -27,6 +27,12 @@ variable "proxmox_node" {
   default     = "pve"
 }
 
+variable "proxmox_node_address" {
+  description = "Proxmox node address"
+  type = string
+  default = "pve.local"
+}
+
 variable "storage" {
   description = "Proxmox storage for VM disks"
   type        = string
