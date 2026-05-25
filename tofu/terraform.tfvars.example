@@ -3,6 +3,7 @@ proxmox_api_token       = "root@pam!tofu=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 proxmox_ssh_username    = "root"
 proxmox_ssh_private_key_path = "~/.ssh/proxmox_tofu"
 proxmox_node            = "pve"
+proxmox_node_address    = "pve.local"
 storage                 = "local-lvm"
 # file_id requires a Proxmox storage path (local:iso/ → /var/lib/vz/template/iso/)
 # unlike create-vm.sh which uses /var/lib/vz/import/ as a staging area for qm disk import
