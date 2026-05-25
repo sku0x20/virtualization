@@ -29,8 +29,8 @@ variable "proxmox_node" {
 
 variable "proxmox_node_address" {
   description = "Proxmox node address"
-  type = string
-  default = "pve.local"
+  type        = string
+  default     = "pve.local"
 }
 
 variable "storage" {
@@ -54,7 +54,7 @@ variable "k3s_token" {
 variable "agent_count" {
   description = "Number of k3s agent nodes"
   type        = number
-  default     =  3
+  default     = 3
 }
 
 variable "control_cores" {
