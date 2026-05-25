@@ -1,8 +1,9 @@
-proxmox_endpoint      = "https://192.168.1.x:8006/"
-proxmox_api_token     = "root@pam!tofu=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-proxmox_ssh_username  = "root"
-proxmox_node          = "pve"
-storage           = "local-lvm"
+proxmox_endpoint        = "https://192.168.1.x:8006/"
+proxmox_api_token       = "root@pam!tofu=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+proxmox_ssh_username    = "root"
+proxmox_ssh_private_key = file("~/.ssh/proxmox_tofu")
+proxmox_node            = "pve"
+storage                 = "local-lvm"
 # file_id requires a Proxmox storage path (local:iso/ → /var/lib/vz/template/iso/)
 # unlike create-vm.sh which uses /var/lib/vz/import/ as a staging area for qm disk import
 alpine_image_id   = "local:iso/generic_alpine-3.23.4-x86_64-uefi-cloudinit-r0.qcow2"
