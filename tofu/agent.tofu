@@ -16,7 +16,8 @@ resource "proxmox_virtual_environment_vm" "agent" {
   count     = var.agent_count
   name      = "k3s-agent-${count.index + 1}"
   node_name = var.proxmox_node
-  started   = true
+  started          = true
+  stop_on_destroy  = true
 
   machine = "q35"
   bios    = "ovmf"
@@ -28,6 +29,7 @@ resource "proxmox_virtual_environment_vm" "agent" {
 
   memory {
     dedicated = var.agent_memory
+    floating  = var.agent_memory_balloon
   }
 
   network_device {

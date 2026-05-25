@@ -12,7 +12,8 @@ resource "proxmox_virtual_environment_file" "control_userdata" {
 resource "proxmox_virtual_environment_vm" "control" {
   name      = "k3s-control"
   node_name = var.proxmox_node
-  started   = true
+  started          = true
+  stop_on_destroy  = true
 
   machine = "q35"
   bios    = "ovmf"
@@ -24,6 +25,7 @@ resource "proxmox_virtual_environment_vm" "control" {
 
   memory {
     dedicated = var.control_memory
+    floating  = var.control_memory_balloon
   }
 
   network_device {

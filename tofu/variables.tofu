@@ -63,9 +63,15 @@ variable "control_cores" {
 }
 
 variable "control_memory" {
-  description = "RAM in MB for control plane"
+  description = "RAM in MB for control plane (balloon ceiling)"
   type        = number
   default     = 1024
+}
+
+variable "control_memory_balloon" {
+  description = "Balloon floor in MB for control plane"
+  type        = number
+  default     = 512
 }
 
 variable "agent_cores" {
@@ -74,7 +80,13 @@ variable "agent_cores" {
 }
 
 variable "agent_memory" {
-  description = "RAM in MB for each agent"
+  description = "RAM in MB for each agent (balloon ceiling)"
   type        = number
   default     = 2048
+}
+
+variable "agent_memory_balloon" {
+  description = "Balloon floor in MB for each agent"
+  type        = number
+  default     = 1024
 }
