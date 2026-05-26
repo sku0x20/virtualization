@@ -36,16 +36,11 @@ write_files:
       net.ipv4.ip_forward = 1
 
 runcmd:
-  - modprobe br_netfilter
-  - modprobe overlay
-  - modprobe ip_tables
-  - modprobe nf_tables
-  - sysctl -p /etc/sysctl.d/k3s.conf
   - swapoff -a
   - sed -i '/ swap / d' /etc/fstab
   - rc-update add qemu-guest-agent default
   - rc-service qemu-guest-agent start
-  - curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent" K3S_URL=${k3s_url} K3S_TOKEN=${k3s_token} sh -
+  - curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_START=true INSTALL_K3S_EXEC="agent" K3S_URL=${k3s_url} K3S_TOKEN=${k3s_token} sh -
 
-# power_state:
-#  mode: reboot
+power_state:
+    mode: reboot
