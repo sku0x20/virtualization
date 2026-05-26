@@ -42,8 +42,9 @@ write_files:
         need k3s
       }
       start() {
+        [ -f /var/lib/k3s-token-created ] && return 0
         until curl -sk https://127.0.0.1:6443/readyz >/dev/null 2>&1; do sleep 5; done
-        k3s token create ${k3s_token}
+        k3s token create ${k3s_token} && touch /var/lib/k3s-token-created
       }
 
 runcmd:
