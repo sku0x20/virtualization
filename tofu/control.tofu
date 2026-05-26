@@ -47,6 +47,7 @@ resource "proxmox_virtual_environment_vm" "control" {
     interface    = "scsi0"
     size         = 12
     file_format  = "raw"
+    cache        = "writeback"
   }
 
   serial_device {}
