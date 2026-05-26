@@ -36,14 +36,14 @@ resource "proxmox_virtual_environment_vm" "control" {
   scsi_hardware = "virtio-scsi-pci"
 
   efi_disk {
-    datastore_id      = var.storage
+    datastore_id      = "local-lvm"
     type              = "4m"
     pre_enrolled_keys = false
   }
 
   disk {
-    datastore_id = var.storage
-    import_from  = var.alpine_image_id
+    datastore_id = "local-lvm"
+    import_from  = "local:import/nocloud_alpine-3.23.4-x86_64-uefi-cloudinit-r0.qcow2"
     interface    = "scsi0"
     size         = 12
     file_format  = "raw"

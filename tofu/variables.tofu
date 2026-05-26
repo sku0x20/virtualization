@@ -33,17 +33,6 @@ variable "proxmox_node_address" {
   default     = "pve.local"
 }
 
-variable "storage" {
-  description = "Proxmox storage for VM disks"
-  type        = string
-  default     = "local-lvm"
-}
-
-variable "alpine_image_id" {
-  description = "Proxmox storage path to the Alpine cloud image, e.g. local:iso/alpine-cloud.qcow2"
-  type        = string
-  default     = "local:import/nocloud_alpine-3.23.4-x86_64-uefi-cloudinit-r0.qcow2"
-}
 
 variable "k3s_token" {
   description = "Shared secret for k3s cluster join"
