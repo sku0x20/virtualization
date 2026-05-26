@@ -50,9 +50,3 @@ variable "k3s_token" {
   type        = string
   sensitive   = true
 }
-
-variable "agent_count" {
-  description = "Number of k3s agent nodes"
-  type        = number
-  default     = 3
-}

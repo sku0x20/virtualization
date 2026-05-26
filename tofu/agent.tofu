@@ -13,7 +13,7 @@ resource "proxmox_virtual_environment_file" "agent_userdata" {
 }
 
 resource "proxmox_virtual_environment_vm" "agent" {
-  count     = var.agent_count
+  count     = 1
   name      = "k3s-agent-${count.index + 1}"
   node_name = var.proxmox_node
   started          = true
