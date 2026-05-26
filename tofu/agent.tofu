@@ -6,7 +6,7 @@ resource "proxmox_virtual_environment_file" "agent_userdata" {
   source_raw {
     data = templatefile("${path.module}/userdata/agent.yaml.tftpl", {
       k3s_url   = "https://${local.control_ip}:6443"
-      k3s_token = var.k3s_token
+      k3s_token = local.k3s_node_token
     })
     file_name = "k3s-agent-vendor.yaml"
   }

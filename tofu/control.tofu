@@ -71,7 +71,34 @@ resource "proxmox_virtual_environment_vm" "control" {
   }
 }
 
+resource "terraform_data" "k3s_node_token" {
+  triggers_replace = [proxmox_virtual_environment_vm.control.id]
+
+  provisioner "local-exec" {
+    command = <<-BASH
+      ssh -o StrictHostKeyChecking=no \
+        -i ${var.proxmox_ssh_private_key_path} \
+        ${var.proxmox_ssh_username}@${var.proxmox_node_address} \
+        'VMID=${proxmox_virtual_environment_vm.control.vm_id}
+         TOKEN=/var/lib/rancher/k3s/server/node-token
+         while true; do
+           result=$(qm guest exec "$VMID" -- /bin/sh -c "[ -f $TOKEN ] && cat $TOKEN" 2>/dev/null) || { sleep 10; continue; }
+           code=$(printf "%s" "$result" | jq -r ".exitcode" 2>/dev/null) || { sleep 10; continue; }
+           [ "$code" = "0" ] || { sleep 10; continue; }
+           printf "%s" "$result" | jq -r ".[\"out-data\"]" | tr -d "\n"
+           break
+         done' > ${path.module}/node-token.txt
+    BASH
+  }
+}
+
+data "local_file" "k3s_node_token" {
+  depends_on = [terraform_data.k3s_node_token]
+  filename   = "${path.module}/node-token.txt"
+}
+
 locals {
   # ipv4_addresses: [[loopback IPs], [eth0 IPs], ...]
-  control_ip = proxmox_virtual_environment_vm.control.ipv4_addresses[1][0]
+  control_ip     = proxmox_virtual_environment_vm.control.ipv4_addresses[1][0]
+  k3s_node_token = trimspace(data.local_file.k3s_node_token.content)
 }
