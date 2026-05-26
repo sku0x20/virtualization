@@ -19,13 +19,13 @@ resource "proxmox_virtual_environment_vm" "control" {
   bios    = "ovmf"
 
   cpu {
-    cores = var.control_cores
+    cores = 2
     type  = "host"
   }
 
   memory {
-    dedicated = var.control_memory
-    floating  = var.control_memory
+    dedicated = 2048
+    floating  = 2048
   }
 
   network_device {

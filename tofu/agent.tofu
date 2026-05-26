@@ -23,13 +23,13 @@ resource "proxmox_virtual_environment_vm" "agent" {
   bios    = "ovmf"
 
   cpu {
-    cores = var.agent_cores
+    cores = 1
     type  = "host"
   }
 
   memory {
-    dedicated = var.agent_memory
-    floating  = var.agent_memory
+    dedicated = 2048
+    floating  = 2048
   }
 
   network_device {

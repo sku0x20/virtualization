@@ -56,25 +56,3 @@ variable "agent_count" {
   type        = number
   default     = 3
 }
-
-variable "control_cores" {
-  type    = number
-  default = 2
-}
-
-variable "control_memory" {
-  description = "RAM in MB for control plane (balloon ceiling)"
-  type        = number
-  default     = 2048
-}
-
-variable "agent_cores" {
-  type    = number
-  default = 1
-}
-
-variable "agent_memory" {
-  description = "RAM in MB for each agent (balloon ceiling)"
-  type        = number
-  default     = 2048
-}
