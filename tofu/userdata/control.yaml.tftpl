@@ -49,5 +49,5 @@ runcmd:
   - until k3s kubectl get --raw /readyz; do sleep 2; done
   - k3s token create ${k3s_token}
 
-power_state:
-  mode: reboot
+# power_state:
+#  mode: reboot
