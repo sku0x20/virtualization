@@ -46,7 +46,7 @@ runcmd:
   - rc-update add qemu-guest-agent default
   - rc-service qemu-guest-agent start
   - until curl -sk ${k3s_url}/readyz; do sleep 5; done
-  - curl -sfL https://get.k3s.io | K3S_URL=${k3s_url} K3S_TOKEN=${k3s_token} sh -
+  - curl -sfL https://get.k3s.io | K3S_URL=${k3s_url} K3S_TOKEN=${k3s_token} INSTALL_K3S_EXEC="--snapshotter=native" sh -
 
 # power_state:
 #  mode: reboot
