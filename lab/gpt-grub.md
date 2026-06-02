@@ -142,7 +142,7 @@ cp boot/vmlinuz-<KVER> /mnt/root/boot/vmlinuz
 target version to be installed in the live env. We hand-write instead — our init only needs `switch_root`, which busybox
 provides, and no modules.
 
-An initrd is a gzipped cpio archive with a shell script as `/init`. Build it:
+Despite being named `initrd.img`, this is actually an **initramfs** — a gzipped cpio archive, not a block device image. The kernel unpacks it directly into `tmpfs` and runs `/init`. No mounting step, no `pivot_root` from a RAM disk. The name `initrd` is just historical baggage that stuck around (GRUB's `initrd` directive accepts both). Build it:
 
 ```
 mkdir -p /tmp/initrd/{bin,dev,proc,sys,newroot}
