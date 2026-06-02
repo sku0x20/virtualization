@@ -88,8 +88,9 @@ mount /dev/sda3 /mnt/root/home
 Install busybox — static binary so the minimal root needs no dynamic linker:
 
 ```
-apt-get install -y busybox-static
-cp /usr/bin/busybox /mnt/root/bin/busybox
+curl -L https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox-x86_64 \
+  -o /mnt/root/bin/busybox
+chmod +x /mnt/root/bin/busybox
 chroot /mnt/root /bin/busybox --install -s /bin
 ln -s /bin/busybox /mnt/root/sbin/init
 ```
@@ -116,21 +117,42 @@ EOF
 
 ---
 
-### 4. Get kernel and initrd
+### 4. Get kernel and build initrd
 
-The live ISO's initrd is built for the live system and will not boot a plain ext4 root. Install a real kernel package to get a proper initrd:
+**Kernel**
 
-```
-apt-get install -y linux-image-amd64
-```
-
-Copy to the root partition's `/boot`:
+`linux-image-amd64` is a metapackage — the actual kernel ships in the versioned package (e.g. `linux-image-6.1.0-18-amd64`). Download that `.deb` directly and extract `vmlinuz` with archive tools, no package manager involved:
 
 ```
-ls /boot/vmlinuz-*      # note the version string, e.g. 6.1.0-18-amd64
-KVER=<version>
-cp /boot/vmlinuz-${KVER}   /mnt/root/boot/vmlinuz
-cp /boot/initrd.img-${KVER} /mnt/root/boot/initrd.img
+# Browse https://ftp.debian.org/debian/pool/main/l/linux/ to find the exact filename
+curl -O https://ftp.debian.org/debian/pool/main/l/linux/linux-image-<KVER>_<PKG_VER>_amd64.deb
+ar x linux-image-*.deb
+tar xf data.tar.xz ./boot/vmlinuz-<KVER>
+cp boot/vmlinuz-<KVER> /mnt/root/boot/vmlinuz
+```
+
+**Initrd**
+
+`mkinitramfs` (from `initramfs-tools`) can generate this automatically, but it requires the kernel modules for the exact target version to be installed in the live env. We hand-write instead — our init only needs `switch_root`, which busybox provides, and no modules.
+
+An initrd is a gzipped cpio archive with a shell script as `/init`. Build it:
+
+```
+mkdir -p /tmp/initrd/{bin,dev,proc,sys,newroot}
+cp /mnt/root/bin/busybox /tmp/initrd/bin/busybox
+chroot /tmp/initrd /bin/busybox --install -s /bin
+
+cat > /tmp/initrd/init << 'EOF'
+#!/bin/sh
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs devtmpfs /dev
+mount /dev/sda2 /newroot
+exec switch_root /newroot /sbin/init
+EOF
+chmod +x /tmp/initrd/init
+
+(cd /tmp/initrd && find . | cpio -H newc -o | gzip > /mnt/root/boot/initrd.img)
 ```
 
 ---
