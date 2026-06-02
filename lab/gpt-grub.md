@@ -126,14 +126,9 @@ EOF
 
 **Kernel**
 
-Download a kernel `.deb` and extract `vmlinuz` with standard tools — `curl`, `ar`, and `tar` are available on any live CD:
-
 ```
-# Browse https://ftp.debian.org/debian/pool/main/l/linux/ to find the exact filename
-curl -O https://ftp.debian.org/debian/pool/main/l/linux/linux-image-<KVER>_<PKG_VER>_amd64.deb
-ar x linux-image-*.deb
-tar xf data.tar.xz ./boot/vmlinuz-<KVER>
-cp boot/vmlinuz-<KVER> /mnt/root/boot/vmlinuz
+apk add linux-virt
+cp /boot/vmlinuz-virt /mnt/root/boot/vmlinuz
 ```
 
 **Initrd**
