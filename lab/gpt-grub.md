@@ -88,11 +88,11 @@ mount /dev/sda1 /mnt/root/boot/efi
 mount /dev/sda3 /mnt/root/home
 ```
 
-Install busybox — static binary so the minimal root needs no dynamic linker. Alpine ships `busybox-static` so no manual download needed:
+Install busybox — static binary so the minimal root needs no dynamic linker:
 
 ```
-apk add busybox-static
-cp /bin/busybox.static /mnt/root/bin/busybox
+curl -L https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox-x86_64 \
+  -o /mnt/root/bin/busybox
 chmod +x /mnt/root/bin/busybox
 chroot /mnt/root /bin/busybox --install -s /bin
 ln -s /bin/busybox /mnt/root/sbin/init
@@ -126,11 +126,14 @@ EOF
 
 **Kernel**
 
-Alpine's `linux-virt` package drops the kernel directly at `/boot/vmlinuz-virt` — no archive extraction needed:
+Download a kernel `.deb` and extract `vmlinuz` with standard tools — `curl`, `ar`, and `tar` are available on any live CD:
 
 ```
-apk add linux-virt
-cp /boot/vmlinuz-virt /mnt/root/boot/vmlinuz
+# Browse https://ftp.debian.org/debian/pool/main/l/linux/ to find the exact filename
+curl -O https://ftp.debian.org/debian/pool/main/l/linux/linux-image-<KVER>_<PKG_VER>_amd64.deb
+ar x linux-image-*.deb
+tar xf data.tar.xz ./boot/vmlinuz-<KVER>
+cp boot/vmlinuz-<KVER> /mnt/root/boot/vmlinuz
 ```
 
 **Initrd**
