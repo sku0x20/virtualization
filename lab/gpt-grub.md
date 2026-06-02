@@ -45,15 +45,17 @@ fdisk /dev/sda
 
 Inside fdisk:
 
-| Key sequence | Action |
-|---|---|
-| `g` | New GPT partition table |
-| `n` → `1` → ↵ → `+512M` | Partition 1 — ESP |
-| `t` → `1` | Set type: EFI System |
-| `n` → `2` → ↵ → `+2G` | Partition 2 — root |
-| `n` → `3` → ↵ → ↵ | Partition 3 — home (rest) |
-| `p` | Verify layout |
-| `w` | Write and exit |
+| Key sequence            | Action                    |
+|-------------------------|---------------------------|
+| `g`                     | New GPT partition table   |
+| `n` → `1` → ↵ → `+512M` | Partition 1 — ESP         |
+| `t` → `1`               | Set type: EFI System      |
+| `n` → `2` → ↵ → `+2G`   | Partition 2 — root        |
+| `n` → `3` → ↵ → ↵       | Partition 3 — home (rest) |
+| `p`                     | Verify layout             |
+| `w`                     | Write and exit            |
+
+No separate `/boot` partition — with UEFI and no encryption, the ESP already plays that role. GRUB reads the kernel and initrd directly from the root partition via its built-in ext4 driver. A separate `/boot` becomes necessary with LUKS, where the kernel must live outside the encrypted volume.
 
 Format:
 
@@ -75,7 +77,8 @@ echo "root: $ROOT_UUID  home: $HOME_UUID"
 
 ### 3. Build the minimal root
 
-Mount root first, then home — home must be mounted before writing to it or files land on the root partition under the mount point:
+Mount root first, then home — home must be mounted before writing to it or files land on the root partition under the
+mount point:
 
 ```
 mkdir -p /mnt/root
@@ -121,7 +124,9 @@ EOF
 
 **Kernel**
 
-`linux-image-amd64` is a metapackage — the actual kernel ships in the versioned package (e.g. `linux-image-6.1.0-18-amd64`). Download that `.deb` directly and extract `vmlinuz` with archive tools, no package manager involved:
+`linux-image-amd64` is a metapackage — the actual kernel ships in the versioned package (e.g.
+`linux-image-6.1.0-18-amd64`). Download that `.deb` directly and extract `vmlinuz` with archive tools, no package
+manager involved:
 
 ```
 # Browse https://ftp.debian.org/debian/pool/main/l/linux/ to find the exact filename
@@ -133,7 +138,9 @@ cp boot/vmlinuz-<KVER> /mnt/root/boot/vmlinuz
 
 **Initrd**
 
-`mkinitramfs` (from `initramfs-tools`) can generate this automatically, but it requires the kernel modules for the exact target version to be installed in the live env. We hand-write instead — our init only needs `switch_root`, which busybox provides, and no modules.
+`mkinitramfs` (from `initramfs-tools`) can generate this automatically, but it requires the kernel modules for the exact
+target version to be installed in the live env. We hand-write instead — our init only needs `switch_root`, which busybox
+provides, and no modules.
 
 An initrd is a gzipped cpio archive with a shell script as `/init`. Build it:
 
@@ -169,7 +176,8 @@ grub-install \
   --bootloader-id=grub
 ```
 
-This copies the GRUB EFI binary to the ESP and writes a UEFI NVRAM boot entry. `efibootmgr` is called internally — you do not call it directly.
+This copies the GRUB EFI binary to the ESP and writes a UEFI NVRAM boot entry. `efibootmgr` is called internally — you
+do not call it directly.
 
 Write `grub.cfg`:
 
@@ -197,7 +205,8 @@ umount /mnt/root
 
 ### 6. Boot
 
-Remove the live ISO. The UEFI firmware reads the NVRAM boot entry, loads `grubx64.efi` from the ESP, which reads `grub.cfg` from the root partition and loads the kernel + initrd.
+Remove the live ISO. The UEFI firmware reads the NVRAM boot entry, loads `grubx64.efi` from the ESP, which reads
+`grub.cfg` from the root partition and loads the kernel + initrd.
 
 The initrd finds the root device by UUID, mounts `/dev/sda2`, and execs `/sbin/init`. You get a shell.
 
@@ -223,19 +232,24 @@ ls /home/alice
 ### 8. Break → recover scenarios
 
 **a. Missing GRUB config**
-Delete `/boot/grub/grub.cfg` and reboot. GRUB drops to its rescue shell. Boot live ISO, remount root, rewrite `grub.cfg`.
+Delete `/boot/grub/grub.cfg` and reboot. GRUB drops to its rescue shell. Boot live ISO, remount root, rewrite
+`grub.cfg`.
 
 **b. Wrong root UUID**
-Edit `grub.cfg`, corrupt the `root=UUID=` value. Reboot. Kernel panics: `VFS: Unable to mount root fs`. Boot live ISO, fix UUID.
+Edit `grub.cfg`, corrupt the `root=UUID=` value. Reboot. Kernel panics: `VFS: Unable to mount root fs`. Boot live ISO,
+fix UUID.
 
 **c. Wiped ESP**
+
 ```
 dd if=/dev/zero of=/dev/sda1 bs=1M count=1
 ```
+
 Reboot — firmware finds no EFI binary. Boot live ISO, reformat ESP (`mkfs.vfat -F32`), reinstall GRUB.
 
 **d. Bypass init**
-At the GRUB menu, press `e`, append `init=/bin/sh` to the `linux` line, press `Ctrl-x`. Kernel execs `/bin/sh` directly, bypassing `/sbin/init` and login.
+At the GRUB menu, press `e`, append `init=/bin/sh` to the `linux` line, press `Ctrl-x`. Kernel execs `/bin/sh` directly,
+bypassing `/sbin/init` and login.
 
 ---
 
@@ -243,4 +257,5 @@ At the GRUB menu, press `e`, append `init=/bin/sh` to the `linux` line, press `C
 
 - lvm
 - luks
-- custom initrd — and the builders that automate it: `initramfs-tools` (Debian), `mkinitcpio` (Arch), `dracut` (Fedora/RHEL)
+- custom initrd — and the builders that automate it: `initramfs-tools` (Debian), `mkinitcpio` (Arch), `dracut` (
+  Fedora/RHEL)
