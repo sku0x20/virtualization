@@ -111,7 +111,7 @@ chmod 640 /mnt/root/etc/shadow
 
 Create `/etc/fstab`:
 
-> `fstab` is read by the init system after `switch_root`, not by the initramfs. The initramfs only mounts root and hands off — everything else (`/home`, swap, etc.) is the init system's job. In this lab, busybox init doesn't process fstab, so `/home` won't auto-mount. fstab becomes active when running a real init system like systemd.
+> `fstab` is read by the init system after `switch_root`, not by the initramfs. The initramfs only mounts root and hands off — everything else (`/home`, swap, etc.) is the init system's job.
 
 ```
 cat > /mnt/root/etc/fstab << EOF
@@ -144,7 +144,9 @@ cp boot/vmlinuz-<KVER> /mnt/root/boot/vmlinuz
 target version to be installed in the live env. We hand-write instead — our init only needs `switch_root`, which busybox
 provides, and no modules.
 
-Despite being named `initrd.img`, this is actually an **initramfs** — a gzipped cpio archive, not a block device image. The kernel unpacks it directly into `tmpfs` and runs `/init`. No mounting step, no `pivot_root` from a RAM disk. The name `initrd` is just historical baggage that stuck around (GRUB's `initrd` directive accepts both). Build it:
+Despite being named `initrd.img`, this is actually an **initramfs** — a gzipped cpio archive, not a block device image. The kernel unpacks it directly into `tmpfs` (a RAM-backed filesystem) and runs `/init`. No mounting step, no `pivot_root` from a RAM disk. The name `initrd` is just historical baggage that stuck around (GRUB's `initrd` directive accepts both).
+
+The initramfs starts as a blank slate — `tmpfs` has no `/proc`, `/sys`, or `/dev`. The `/init` script must mount these manually before it can see block devices or do anything useful. Once root is mounted, `switch_root` discards the tmpfs and hands off. Build it:
 
 ```
 mkdir -p /tmp/initrd/{bin,dev,proc,sys,newroot}
