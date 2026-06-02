@@ -25,6 +25,13 @@ Understand the boot chain: UEFI firmware → ESP → GRUB → kernel → root pa
 - Valid UEFI environment required (EFI variables must be writable)
 - An empty disk available — steps assume `/dev/sda`
 
+**Alpine: bring up networking first**
+```
+ip link set eth0 up   # replace eth0 with your interface (ip link to check)
+udhcpc -i eth0
+apk add curl
+```
+
 ---
 
 ### 1. Identify the disk
