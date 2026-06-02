@@ -111,7 +111,7 @@ chmod 640 /mnt/root/etc/shadow
 
 Create `/etc/fstab`:
 
-> `fstab` is read by the init system after `switch_root`, not by the initramfs. The initramfs only mounts root and hands off — everything else (`/home`, swap, etc.) is the init system's job.
+> `fstab` is read by the init system after `switch_root`, not by the initramfs. The initramfs only mounts root and hands off — everything else (`/home`, swap, etc.) is the init system's job. You couldn't mount `/home` in the initramfs even if you wanted to: `/etc/fstab` lives on the root partition, which hasn't been mounted yet. By the time you've mounted root and can read `fstab`, you're about to `switch_root` anyway.
 
 ```
 cat > /mnt/root/etc/fstab << EOF
