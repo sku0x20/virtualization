@@ -111,6 +111,8 @@ chmod 640 /mnt/root/etc/shadow
 
 Create `/etc/fstab`:
 
+> `fstab` is read by the init system after `switch_root`, not by the initramfs. The initramfs only mounts root and hands off — everything else (`/home`, swap, etc.) is the init system's job. In this lab, busybox init doesn't process fstab, so `/home` won't auto-mount. fstab becomes active when running a real init system like systemd.
+
 ```
 cat > /mnt/root/etc/fstab << EOF
 UUID=${ROOT_UUID}  /      ext4  defaults  0 1
