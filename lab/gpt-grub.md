@@ -88,11 +88,11 @@ mount /dev/sda1 /mnt/root/boot/efi
 mount /dev/sda3 /mnt/root/home
 ```
 
-Install busybox — static binary so the minimal root needs no dynamic linker:
+Install busybox — static binary so the minimal root needs no dynamic linker. Alpine ships `busybox-static` so no manual download needed:
 
 ```
-curl -L https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox-x86_64 \
-  -o /mnt/root/bin/busybox
+apk add busybox-static
+cp /bin/busybox.static /mnt/root/bin/busybox
 chmod +x /mnt/root/bin/busybox
 chroot /mnt/root /bin/busybox --install -s /bin
 ln -s /bin/busybox /mnt/root/sbin/init
@@ -126,16 +126,11 @@ EOF
 
 **Kernel**
 
-`linux-image-amd64` is a metapackage — the actual kernel ships in the versioned package (e.g.
-`linux-image-6.1.0-18-amd64`). Download that `.deb` directly and extract `vmlinuz` with archive tools, no package
-manager involved:
+Alpine's `linux-virt` package drops the kernel directly at `/boot/vmlinuz-virt` — no archive extraction needed:
 
 ```
-# Browse https://ftp.debian.org/debian/pool/main/l/linux/ to find the exact filename
-curl -O https://ftp.debian.org/debian/pool/main/l/linux/linux-image-<KVER>_<PKG_VER>_amd64.deb
-ar x linux-image-*.deb
-tar xf data.tar.xz ./boot/vmlinuz-<KVER>
-cp boot/vmlinuz-<KVER> /mnt/root/boot/vmlinuz
+apk add linux-virt
+cp /boot/vmlinuz-virt /mnt/root/boot/vmlinuz
 ```
 
 **Initrd**
@@ -171,7 +166,7 @@ chmod +x /tmp/initrd/init
 ### 5. Install GRUB
 
 ```
-apt-get install -y grub-efi-amd64
+apk add grub grub-efi
 
 grub-install \
   --target=x86_64-efi \
