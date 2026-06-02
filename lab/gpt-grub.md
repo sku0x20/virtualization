@@ -259,3 +259,4 @@ bypassing `/sbin/init` and login.
 - luks
 - custom initrd — and the builders that automate it: `initramfs-tools` (Debian), `mkinitcpio` (Arch), `dracut` (
   Fedora/RHEL)
+- custom Debian image; live-wrapper,mmdebstrap,vmdb2, lwrap, linux-image-amd64, live-boot
