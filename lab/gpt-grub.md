@@ -29,6 +29,7 @@ Understand the boot chain: UEFI firmware → ESP → GRUB → kernel → root pa
 ```
 ip link set eth0 up   # replace eth0 with your interface (ip link to check)
 udhcpc -i eth0
+apk update
 apk add curl
 ```
 
