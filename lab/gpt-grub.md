@@ -8,7 +8,7 @@ Understand the boot chain: UEFI firmware → ESP → GRUB → kernel → root pa
 
 ## Plan
 
-1. Raw disk, live boot into Debian live ISO
+1. Raw disk, live boot into a live CD
 2. Partition manually – GPT, ESP, root, home
 3. Build minimal root — busybox + `/etc/passwd` `/etc/shadow` `/etc/group` `/etc/fstab`
 4. Download kernel + initrd onto ESP
@@ -21,7 +21,7 @@ Understand the boot chain: UEFI firmware → ESP → GRUB → kernel → root pa
 
 ### Prerequisites
 
-- Booted into a Debian live ISO
+- Booted into a live CD
 - Valid UEFI environment required (EFI variables must be writable)
 - An empty disk available — steps assume `/dev/sda`
 
