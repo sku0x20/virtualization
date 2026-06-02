@@ -243,4 +243,4 @@ At the GRUB menu, press `e`, append `init=/bin/sh` to the `linux` line, press `C
 
 - lvm
 - luks
-- custom initrd
+- custom initrd — and the builders that automate it: `initramfs-tools` (Debian), `mkinitcpio` (Arch), `dracut` (Fedora/RHEL)
