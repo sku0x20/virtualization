@@ -29,6 +29,11 @@ Understand the boot chain: UEFI firmware → ESP → GRUB → kernel → root pa
 ```
 ip link set eth0 up   # replace eth0 with your interface (ip link to check)
 udhcpc -i eth0
+
+# if apk update fails, repos may not be configured
+echo "https://dl-cdn.alpinelinux.org/alpine/latest-stable/main" >> /etc/apk/repositories
+echo "https://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories
+
 apk update
 apk add curl
 ```
