@@ -25,7 +25,7 @@ Understand the boot chain: UEFI firmware → ESP → GRUB → kernel → root pa
 - Valid UEFI environment required (EFI variables must be writable)
 - An empty disk available — steps assume `/dev/sda`
 
-**Alpine: bring up networking first**
+**Alpine: Prepare the live environment**
 ```
 ip link set eth0 up   # replace eth0 with your interface (ip link to check)
 udhcpc -i eth0
@@ -35,7 +35,8 @@ echo "https://dl-cdn.alpinelinux.org/alpine/latest-stable/main" >> /etc/apk/repo
 echo "https://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories
 
 apk update
-apk add curl
+apk add bash curl util-linux e2fsprogs blkid
+bash
 ```
 
 ---
@@ -104,8 +105,7 @@ mount /dev/sda3 /mnt/root/home
 Install busybox — static binary so the minimal root needs no dynamic linker:
 
 ```
-curl -L https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox-x86_64 \
-  -o /mnt/root/bin/busybox
+curl -sfL https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox -o /mnt/root/bin/busybox
 chmod +x /mnt/root/bin/busybox
 chroot /mnt/root /bin/busybox --install -s /bin
 ln -s /bin/busybox /mnt/root/sbin/init
