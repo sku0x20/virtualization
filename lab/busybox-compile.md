@@ -30,6 +30,7 @@ curl -sfL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.tar.xz -o linux
 tar -xf linux-7.0.tar.xz
 cd linux-7.0
 make mrproper
+make defconfig
 make headers_install ARCH=x86_64 INSTALL_HDR_PATH=/usr/local/kernel-headers
 cd ..
 ```
