@@ -23,6 +23,18 @@ apt-get install -y gcc make musl-tools perl
 
 ---
 
+### 1. Get the source
+
+Check the latest stable release at busybox.net/downloads, then:
+
+```
+curl -sfL https://busybox.net/downloads/busybox-1.37.0.tar.bz2 -o busybox-1.37.0.tar.bz2
+tar -xf busybox-1.37.0.tar.bz2
+cd busybox-1.37.0
+```
+
+---
+
 ## TODO
 
 - [ ] Get BusyBox source (busybox.net tarball)
