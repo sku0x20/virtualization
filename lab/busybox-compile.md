@@ -40,22 +40,8 @@ cd busybox-1.38.0
 Generate a default config:
 
 ```
-make defconfig
-```
-
-This writes `.config` with sane defaults for the current arch. One setting needs changing for a static musl build — enable `CONFIG_STATIC`. Two ways:
-
-**Option A — interactive TUI** (needs `libncurses-dev`)
-```
 apt-get install -y libncurses-dev
 make menuconfig
-```
-Navigate to *Settings* → enable *Build static binary (no shared libs)*, save and exit.
-
-**Option B — command-line**
-```
-scripts/config --enable STATIC
-make oldconfig
 ```
 
 Verify:
@@ -63,6 +49,16 @@ Verify:
 grep CONFIG_STATIC .config
 ```
 Expected: `CONFIG_STATIC=y`
+
+---
+
+### 3. Compile
+
+```
+make CC=musl-gcc -j$(nproc)
+```
+
+`CC=musl-gcc` routes all compilation through musl's wrapper so the static binary has no glibc dependency.
 
 ---
 
