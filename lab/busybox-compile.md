@@ -57,7 +57,7 @@ Expected: `CONFIG_STATIC=y`
 ### 3. Compile
 
 ```
-make CC=musl-gcc -j$(nproc) CFLAGS="-I/usr/src/linux-headers-$(uname -r)/include/uapi"
+make CC=musl-gcc -j$(nproc) CFLAGS="-I/usr/src/linux-headers-<version>/include/uapi"
 ```
 
 `CC=musl-gcc` routes all compilation through musl's wrapper so the static binary has no glibc dependency.
