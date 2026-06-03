@@ -43,28 +43,26 @@ Generate a default config:
 make defconfig
 ```
 
-This writes `.config` with sane defaults for the current arch. Two settings need changing for a clean static musl build:
+This writes `.config` with sane defaults for the current arch. One setting needs changing for a static musl build — enable `CONFIG_STATIC`. Two ways:
 
-Open `.config` in an editor and set:
-
+**Option A — interactive TUI** (needs `libncurses-dev`)
 ```
-CONFIG_STATIC=y
-CONFIG_CROSS_COMPILER_PREFIX=""
+apt-get install -y libncurses-dev
+make menuconfig
 ```
+Navigate to *Settings* → enable *Build static binary (no shared libs)*, save and exit.
 
-You'll pass `CC=musl-gcc` at compile time instead; clearing the prefix avoids a double-wrap.
+**Option B — command-line**
+```
+scripts/config --enable STATIC
+make oldconfig
+```
 
 Verify:
-
 ```
-grep -E 'CONFIG_STATIC|CONFIG_CROSS_COMPILER_PREFIX' .config
+grep CONFIG_STATIC .config
 ```
-
-Expected:
-```
-CONFIG_STATIC=y
-CONFIG_CROSS_COMPILER_PREFIX=""
-```
+Expected: `CONFIG_STATIC=y`
 
 ---
 
