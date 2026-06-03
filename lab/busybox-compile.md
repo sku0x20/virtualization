@@ -17,6 +17,9 @@ Understand how BusyBox bundles hundreds of tools into a single binary and how to
 ```
 apt-get update
 apt-get install -y gcc make musl-tools perl bzip2
+
+uname -r
+apt-get install -y linux-headers-<version>
 ```
 
 `musl-tools` provides the `musl-gcc` wrapper — use it instead of `gcc` when compiling BusyBox. Musl is designed for clean static linking; glibc is not (it `dlopen()`s NSS modules at runtime for DNS/user lookups, so a "static" glibc binary isn't truly portable).
