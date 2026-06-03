@@ -45,21 +45,27 @@ make defconfig
 
 This writes `.config` with sane defaults for the current arch. Two settings need changing for a clean static musl build:
 
-**Enable static linking**
-```
-sed -i 's/# CONFIG_STATIC is not set/CONFIG_STATIC=y/' .config
-```
+Open `.config` in an editor:
 
-Without this, BusyBox links against the system libc dynamically — which defeats the point of using musl.
-
-**Point the compiler at musl-gcc**
 ```
-sed -i 's|^CONFIG_CROSS_COMPILER_PREFIX=.*|CONFIG_CROSS_COMPILER_PREFIX=""|' .config
+nano .config
 ```
 
-You'll pass `CC=musl-gcc` at compile time instead; clearing the cross-compiler prefix avoids a double-wrap.
+Find and set these two lines (use `Ctrl+W` to search):
 
-Verify both took:
+**Static linking** — find the line `# CONFIG_STATIC is not set` and replace it with:
+```
+CONFIG_STATIC=y
+```
+
+**Compiler prefix** — find `CONFIG_CROSS_COMPILER_PREFIX` and make sure it's empty:
+```
+CONFIG_CROSS_COMPILER_PREFIX=""
+```
+
+You'll pass `CC=musl-gcc` at compile time instead; clearing the prefix avoids a double-wrap.
+
+Save and exit (`Ctrl+O`, `Ctrl+X`), then verify:
 
 ```
 grep -E 'CONFIG_STATIC|CONFIG_CROSS_COMPILER_PREFIX' .config
