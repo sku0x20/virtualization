@@ -16,7 +16,7 @@ Understand how BusyBox bundles hundreds of tools into a single binary and how to
 **Install build tools**
 ```
 apt-get update
-apt-get install -y gcc make musl-tools perl bzip2
+apt-get install -y gcc make musl-tools perl bzip2 libncurses-dev
 
 uname -r
 apt-get install -y linux-headers-<version>
@@ -43,7 +43,6 @@ cd busybox-1.38.0
 Generate a default config:
 
 ```
-apt-get install -y libncurses-dev
 make menuconfig
 ```
 
