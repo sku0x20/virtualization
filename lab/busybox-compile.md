@@ -16,10 +16,10 @@ Understand how BusyBox bundles hundreds of tools into a single binary and how to
 **Install build tools**
 ```
 apt-get update
-apt-get install -y build-essential perl
+apt-get install -y build-essential musl-tools perl
 ```
 
-`build-essential` pulls in `libc6-dev` which provides `/usr/lib/.../libc.a` — required to produce a fully static binary. Without it, the linker has no static glibc to link against and the build fails.
+`musl-tools` provides the `musl-gcc` wrapper — use it instead of `gcc` when compiling BusyBox. Musl is designed for clean static linking; glibc is not (it `dlopen()`s NSS modules at runtime for DNS/user lookups, so a "static" glibc binary isn't truly portable).
 
 ---
 
