@@ -57,6 +57,10 @@ Generate a default config:
 make menuconfig
 ```
 
+In menuconfig, also disable `tc` — it uses kernel headers removed in 7.0:
+
+*Networking Utilities* → uncheck `tc`
+
 Verify:
 ```
 grep CONFIG_STATIC .config
