@@ -35,6 +35,44 @@ cd busybox-1.38.0
 
 ---
 
+### 2. Configure
+
+Generate a default config:
+
+```
+make defconfig
+```
+
+This writes `.config` with sane defaults for the current arch. Two settings need changing for a clean static musl build:
+
+**Enable static linking**
+```
+sed -i 's/# CONFIG_STATIC is not set/CONFIG_STATIC=y/' .config
+```
+
+Without this, BusyBox links against the system libc dynamically — which defeats the point of using musl.
+
+**Point the compiler at musl-gcc**
+```
+sed -i 's|^CONFIG_CROSS_COMPILER_PREFIX=.*|CONFIG_CROSS_COMPILER_PREFIX=""|' .config
+```
+
+You'll pass `CC=musl-gcc` at compile time instead; clearing the cross-compiler prefix avoids a double-wrap.
+
+Verify both took:
+
+```
+grep -E 'CONFIG_STATIC|CONFIG_CROSS_COMPILER_PREFIX' .config
+```
+
+Expected:
+```
+CONFIG_STATIC=y
+CONFIG_CROSS_COMPILER_PREFIX=""
+```
+
+---
+
 ## TODO
 
 - [ ] Get BusyBox source (busybox.net tarball)
