@@ -16,13 +16,22 @@ Understand how BusyBox bundles hundreds of tools into a single binary and how to
 **Install build tools**
 ```
 apt-get update
-apt-get install -y gcc make musl-tools perl bzip2 libncurses-dev
-
-uname -r
-apt-get install -y linux-headers-<version>
+apt-get install -y gcc make musl-tools perl bzip2 libncurses-dev xz-utils
 ```
 
 `musl-tools` provides the `musl-gcc` wrapper — use it instead of `gcc` when compiling BusyBox. Musl is designed for clean static linking; glibc is not (it `dlopen()`s NSS modules at runtime for DNS/user lookups, so a "static" glibc binary isn't truly portable).
+
+**Install kernel headers**
+
+The `linux-headers-*` apt package is for building kernel modules — not suitable for userspace compilation. Download the kernel source and run `headers_install` instead, which produces sanitized userspace-only headers:
+
+```
+curl -sfL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.tar.xz -o linux-7.0.tar.xz
+tar -xf linux-7.0.tar.xz
+cd linux-7.0
+make headers_install ARCH=x86_64 INSTALL_HDR_PATH=/usr/local/kernel-headers
+cd ..
+```
 
 ---
 
@@ -57,7 +66,7 @@ Expected: `CONFIG_STATIC=y`
 ### 3. Compile
 
 ```
-make CC=musl-gcc -j$(nproc) CFLAGS="-I/usr/src/linux-headers-<version>/include/uapi"
+make CC=musl-gcc -j$(nproc) CFLAGS="-I/usr/local/kernel-headers/include"
 ```
 
 `CC=musl-gcc` routes all compilation through musl's wrapper so the static binary has no glibc dependency.
