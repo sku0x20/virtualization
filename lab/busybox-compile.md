@@ -45,27 +45,16 @@ make defconfig
 
 This writes `.config` with sane defaults for the current arch. Two settings need changing for a clean static musl build:
 
-Open `.config` in an editor:
+Open `.config` in an editor and set:
 
-```
-nano .config
-```
-
-Find and set these two lines (use `Ctrl+W` to search):
-
-**Static linking** — find the line `# CONFIG_STATIC is not set` and replace it with:
 ```
 CONFIG_STATIC=y
-```
-
-**Compiler prefix** — find `CONFIG_CROSS_COMPILER_PREFIX` and make sure it's empty:
-```
 CONFIG_CROSS_COMPILER_PREFIX=""
 ```
 
 You'll pass `CC=musl-gcc` at compile time instead; clearing the prefix avoids a double-wrap.
 
-Save and exit (`Ctrl+O`, `Ctrl+X`), then verify:
+Verify:
 
 ```
 grep -E 'CONFIG_STATIC|CONFIG_CROSS_COMPILER_PREFIX' .config
