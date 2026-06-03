@@ -10,16 +10,16 @@ Understand how BusyBox bundles hundreds of tools into a single binary and how to
 
 ### Prerequisites
 
-- Alpine Linux environment (live ISO or VM)
+- Ubuntu Server (minimal install) environment
 - Internet access — needed to download the BusyBox tarball
 
-**Alpine: Install build tools**
+**Install build tools**
 ```
-apk update
-apk add gcc musl-dev make perl
+apt-get update
+apt-get install -y build-essential perl
 ```
 
-`musl-dev` provides the static musl libc headers and `crt` objects — required to produce a fully static binary on Alpine. Without it, the linker has no static libc to link against and the build fails.
+`build-essential` pulls in `libc6-dev` which provides `/usr/lib/.../libc.a` — required to produce a fully static binary. Without it, the linker has no static glibc to link against and the build fails.
 
 ---
 
