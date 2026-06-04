@@ -45,3 +45,10 @@ Adjust options according to need:
 make menuconfig
 ```
 
+### 3. Compile
+
+```
+apt-get install -y bc
+make -j$(nproc)
+```
+
