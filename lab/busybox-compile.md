@@ -99,12 +99,3 @@ ldd busybox
 `--list` prints every applet compiled in — the count gives a quick sanity check that nothing was silently skipped.
 
 ---
-
-## TODO
-
-- [ ] Get BusyBox source (busybox.net tarball)
-- [ ] Configure — `make defconfig`, then set `CONFIG_STATIC=y`
-- [ ] Compile
-- [ ] Verify it's statically linked (`file busybox`, `ldd busybox`)
-- [ ] Install symlinks (`busybox --install -s /path/to/bin`)
-- [ ] Drop into the GPT+GRUB lab in place of the downloaded binary
