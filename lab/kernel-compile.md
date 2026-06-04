@@ -39,16 +39,9 @@ apt-get install -y make gcc flex bison perl libncurses-dev
 make tinyconfig
 ```
 
-`tinyconfig` produces a `.config` with nearly everything off — modules already disabled. From here, use `menuconfig` to enable anything specific you need:
+In `menuconfig`, disable modules.
 
 ```
 make menuconfig
 ```
 
-Verify modules are off:
-
-```
-grep CONFIG_MODULES .config
-```
-
-Expected: `CONFIG_MODULES=n`
