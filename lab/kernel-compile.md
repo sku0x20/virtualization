@@ -21,15 +21,13 @@ Understand what goes into a kernel build: configuration, compilation, and the ou
 - Ubuntu Server (minimal install) environment
 - Internet access — needed to download the kernel tarball
 
-**Install build tools**
-```
-apt-get update
-apt-get install -y gcc make flex bison libssl-dev libelf-dev bc perl xz-utils curl
-```
-
 ---
 
 ### 1. Get the source
+
+```
+apt-get install -y curl xz-utils
+```
 
 Check the latest stable release at kernel.org, then:
 
