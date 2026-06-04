@@ -125,12 +125,13 @@ apt-get install -y clang musl-dev
 
 **Compile**
 ```
-make CC="clang --target=x86_64-linux-musl" \
+make CC="clang --target=x86_64-linux-musl -ffreestanding -rtlib=compiler-rt" \
   HOSTCC=clang -j$(nproc) \
-  CFLAGS="-nostdinc -isystem /usr/include/x86_64-linux-musl -I/usr/local/kernel-headers/include" \
-  LDFLAGS="-nostdlib -L/usr/lib/x86_64-linux-musl -lc"
+  CFLAGS="-nostdinc -isystem /usr/include/x86_64-linux-musl -isystem /usr/local/kernel-headers/include" \
+  LDFLAGS="-nostdlib -L /usr/lib/x86_64-linux-musl -lc"
 ```
 
+- `HOSTCC=clang` — builds host-side build tools (e.g. `fixdep`) with clang too
 - `--target=x86_64-linux-musl` — sets the target ABI; alone it doesn't change which libc gets
   linked, clang still searches system paths where glibc lives
 - `-nostdinc` — disables all default include paths so glibc headers under `/usr/include` are not
@@ -144,8 +145,8 @@ make CC="clang --target=x86_64-linux-musl" \
   replace loops/mem ops with `memcpy`/`memset` calls that don't exist in a no-libc setup
 - `-nodefaultlibs` — weaker than `-nostdlib`, skips default libs but keeps startup files; useful
   when you want musl's libc but still need the compiler runtime (`libgcc`/`compiler-rt`)
-- `-rtlib=compiler-rt` — use clang's own runtime instead of `libgcc`; pairs better with musl
-- `HOSTCC=clang` — builds host-side build tools (e.g. `fixdep`) with clang too
+- `-rtlib=compiler-rt` — The compiler runtime provides low-level helpers the compiler itself emits calls to — things like software division, 64-bit arithmetic on 32-bit systems,
+  sanitizer support. gcc has libgcc for this, clang has compiler-rt.
 
 **Verify the same way**
 ```
