@@ -69,7 +69,7 @@ arch/x86/boot/bzImage
 A drop-in swap for step 3. Everything else (config) stays the same.
 
 ```
-apt-get install -y clang lld
+apt-get install -y clang lld llvm
 make LLVM=1 -j$(nproc)
 ```
 
