@@ -90,6 +90,14 @@ ldd busybox
 
 `file` should report `statically linked`. `ldd` should say `not a dynamic executable`.
 
+```
+./busybox echo "hello from busybox"
+./busybox ls /
+./busybox --list | wc -l
+```
+
+`--list` prints every applet compiled in — the count gives a quick sanity check that nothing was silently skipped.
+
 ---
 
 ## TODO
