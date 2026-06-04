@@ -30,3 +30,10 @@ curl -sfL https://musl.libc.org/releases/musl-1.2.6.tar.gz -o musl-1.2.6.tar.gz
 tar -xf musl-1.2.6.tar.gz
 cd musl-1.2.6
 ```
+
+### 2. Configure
+
+```
+apt-get install -y gcc make
+./configure --prefix=/usr/local/musl
+```
