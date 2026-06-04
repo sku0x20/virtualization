@@ -125,13 +125,16 @@ apt-get install -y clang musl-dev
 
 **Compile**
 ```
-make CC="clang -static --target=x86_64-linux-musl" HOSTCC=clang -j$(nproc) \
+make CC="clang --target=x86_64-linux-musl --sysroot=/usr/lib/x86_64-linux-musl" \
+  HOSTCC=clang -j$(nproc) \
   CFLAGS="-I/usr/local/kernel-headers/include"
 ```
 
-- `--target=x86_64-linux-musl` tells clang to use the musl ABI — same portability guarantee as `musl-gcc`
+- `--target=x86_64-linux-musl` tells clang the target ABI — but alone it doesn't change which libc
+  gets linked; clang still searches system paths where glibc lives first
+- `--sysroot` is what actually forces musl — clang looks for headers and libs under that directory
+  instead of default system paths; `/usr/lib/x86_64-linux-musl` is where `musl-dev` installs on Ubuntu
 - `HOSTCC=clang` builds the host-side build tools (e.g. `fixdep`) with clang too
-- `-static` is redundant with `CONFIG_STATIC=y` in `.config` but harmless to be explicit
 
 **Verify the same way**
 ```
