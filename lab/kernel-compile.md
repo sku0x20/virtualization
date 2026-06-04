@@ -25,13 +25,10 @@ Understand what goes into a kernel build: configuration, compilation, and the ou
 
 ### 1. Get the source
 
-```
-apt-get install -y curl xz-utils
-```
-
 Check the latest stable release at kernel.org, then:
 
 ```
+apt-get install -y curl xz-utils
 curl -sfL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.tar.xz -o linux-7.0.tar.xz
 tar -xf linux-7.0.tar.xz
 cd linux-7.0
@@ -43,11 +40,6 @@ cd linux-7.0
 
 ```
 apt-get install -y make gcc flex bison perl libncurses-dev
-```
-
-Start from the smallest possible base:
-
-```
 make tinyconfig
 ```
 
