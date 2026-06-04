@@ -26,7 +26,7 @@ Check the latest release at musl.libc.org, then:
 
 ```
 apt-get install -y curl xz-utils
-curl -sfL https://musl.libc.org/releases/musl-1.2.5.tar.gz -o musl-1.2.5.tar.gz
-tar -xf musl-1.2.5.tar.gz
-cd musl-1.2.5
+curl -sfL https://musl.libc.org/releases/musl-1.2.6.tar.gz -o musl-1.2.6.tar.gz
+tar -xf musl-1.2.6.tar.gz
+cd musl-1.2.6
 ```
