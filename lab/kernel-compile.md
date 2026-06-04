@@ -38,3 +38,31 @@ cd linux-7.0
 ```
 
 ---
+
+### 2. Configure
+
+```
+apt-get install -y make gcc flex bison perl libncurses-dev
+```
+
+Start from the smallest possible base:
+
+```
+make tinyconfig
+```
+
+`tinyconfig` produces a `.config` with nearly everything off — modules already disabled. From here, use `menuconfig` to enable anything specific you need:
+
+```
+make menuconfig
+```
+
+Verify modules are off:
+
+```
+grep CONFIG_MODULES .config
+```
+
+Expected: `CONFIG_MODULES=n`
+
+---
