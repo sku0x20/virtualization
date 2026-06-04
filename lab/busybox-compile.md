@@ -97,3 +97,35 @@ ldd busybox
 ```
 
 `--list` prints every applet compiled in — the count gives a quick sanity check that nothing was silently skipped.
+
+---
+
+## Adventure: Compile with Clang
+
+A drop-in swap for step 3. Everything else (config, kernel headers) stays the same.
+
+**Install clang and musl dev files**
+```
+apt-get install -y clang musl-dev
+```
+
+`musl-dev` provides the musl headers and static lib so clang can link against it instead of glibc.
+
+**Compile**
+```
+make CC="clang -static --target=x86_64-linux-musl" HOSTCC=clang -j$(nproc) \
+  CFLAGS="-I/usr/local/kernel-headers/include"
+```
+
+- `--target=x86_64-linux-musl` tells clang to use the musl ABI — same portability guarantee as `musl-gcc`
+- `HOSTCC=clang` builds the host-side build tools (e.g. `fixdep`) with clang too
+- `-static` is redundant with `CONFIG_STATIC=y` in `.config` but harmless to be explicit
+
+**Verify the same way**
+```
+file busybox
+ldd busybox
+./busybox echo "hello from clang busybox"
+```
+
+The "Avoid gcc-specific code constructs" setting from step 2 is what makes this work cleanly — without it, clang chokes on a handful of gcc extensions in the BusyBox source.
