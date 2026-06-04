@@ -62,6 +62,13 @@ arch/x86/boot/bzImage
 
 `vmlinuz` is just the name distros use after installing — same file.
 
+### 5. Verify
+
+```
+file arch/x86/boot/bzImage
+strings arch/x86/boot/bzImage | grep "Linux version"
+```
+
 ---
 
 ## Adventure: Compile with Clang
