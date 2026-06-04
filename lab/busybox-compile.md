@@ -125,16 +125,22 @@ apt-get install -y clang musl-dev
 
 **Compile**
 ```
-make CC="clang --target=x86_64-linux-musl --sysroot=/usr/lib/x86_64-linux-musl" \
+make CC="clang --target=x86_64-linux-musl" \
   HOSTCC=clang -j$(nproc) \
-  CFLAGS="-I/usr/local/kernel-headers/include"
+  CFLAGS="-nostdinc -isystem /usr/include/x86_64-linux-musl -I/usr/local/kernel-headers/include" \
+  LDFLAGS="-nostdlib -L/usr/lib/x86_64-linux-musl -lc"
 ```
 
-- `--target=x86_64-linux-musl` tells clang the target ABI — but alone it doesn't change which libc
-  gets linked; clang still searches system paths where glibc lives first
-- `--sysroot` is what actually forces musl — clang looks for headers and libs under that directory
-  instead of default system paths; `/usr/lib/x86_64-linux-musl` is where `musl-dev` installs on Ubuntu
-- `HOSTCC=clang` builds the host-side build tools (e.g. `fixdep`) with clang too
+- `--target=x86_64-linux-musl` — sets the target ABI; alone it doesn't change which libc gets
+  linked, clang still searches system paths where glibc lives
+- `-nostdinc` — disables all default include paths so glibc headers under `/usr/include` are not
+  picked up; only explicitly passed `-isystem`/`-I` paths are searched
+- `-isystem /usr/include/x86_64-linux-musl` — musl's headers (installed by `musl-dev`); `-isystem`
+  instead of `-I` so warnings from musl's own headers are suppressed
+- `-nostdlib` — disables default lib search paths and startup files so glibc's `libc.a` and
+  `crt0.o` are not pulled in
+- `-L/usr/lib/x86_64-linux-musl -lc` — explicitly link musl's `libc.a` from its install location
+- `HOSTCC=clang` — builds host-side build tools (e.g. `fixdep`) with clang too
 
 **Verify the same way**
 ```
