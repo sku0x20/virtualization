@@ -140,6 +140,11 @@ make CC="clang --target=x86_64-linux-musl" \
 - `-nostdlib` — disables default lib search paths and startup files so glibc's `libc.a` and
   `crt0.o` are not pulled in
 - `-L/usr/lib/x86_64-linux-musl -lc` — explicitly link musl's `libc.a` from its install location
+- `-ffreestanding` — tells the compiler no stdlib exists; without it the compiler may silently
+  replace loops/mem ops with `memcpy`/`memset` calls that don't exist in a no-libc setup
+- `-nodefaultlibs` — weaker than `-nostdlib`, skips default libs but keeps startup files; useful
+  when you want musl's libc but still need the compiler runtime (`libgcc`/`compiler-rt`)
+- `-rtlib=compiler-rt` — use clang's own runtime instead of `libgcc`; pairs better with musl
 - `HOSTCC=clang` — builds host-side build tools (e.g. `fixdep`) with clang too
 
 **Verify the same way**
@@ -151,25 +156,3 @@ ldd busybox
 
 The "Avoid gcc-specific code constructs" setting from step 2 is what makes this work cleanly —
 without it, clang chokes on a handful of gcc extensions in the BusyBox source.
-
----
-
-## No-libc / raw syscall compilation flags
-
-For compiling without any libc at all — writing `_start` yourself and calling the kernel directly
-via `syscall` asm:
-
-| Flag | What it does |
-|---|---|
-| `-nostdinc` | No default include paths — glibc/musl headers not searched |
-| `-nostdlib` | No default libs or startup files (`crt0.o` etc) linked |
-| `-nodefaultlibs` | Weaker than `-nostdlib` — skips libs but keeps startup files |
-| `-ffreestanding` | Tells the compiler no stdlib exists — prevents it from silently replacing loops/mem ops with `memcpy`/`memset` calls that don't exist |
-| `-static` | Link only static libs, refuse shared libs |
-
-`-ffreestanding` is the easy one to miss — without it the compiler may generate implicit calls to
-library functions as optimizations, which then fail to link since there's no libc.
-
-The entry point is `_start` (not `main`). Syscall args go in registers per the x86-64 Linux ABI:
-`rax` = syscall number, `rdi rsi rdx r10 r8 r9` = args. Watch out for caller-saved registers
-getting clobbered across the syscall.
