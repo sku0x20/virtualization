@@ -126,7 +126,7 @@ apt-get install -y clang lld musl-dev
 
 **Compile**
 ```
-make CC="clang --target=x86_64-linux-musl -ffreestanding" \
+make CC="clang --target=x86_64-linux-musl" \
   HOSTCC=clang -j$(nproc) \
   CFLAGS="-nostdinc -isystem /usr/include/x86_64-linux-musl -isystem /usr/local/kernel-headers/include" \
   LDFLAGS="-nostdlib -rtlib=compiler-rt -fuse-ld=lld -L /usr/lib/x86_64-linux-musl -lc"
@@ -142,13 +142,13 @@ make CC="clang --target=x86_64-linux-musl -ffreestanding" \
 - `-nostdlib` — disables default lib search paths and startup files so glibc's `libc.a` and
   `crt0.o` are not pulled in
 - `-L/usr/lib/x86_64-linux-musl -lc` — explicitly link musl's `libc.a` from its install location
-- `-ffreestanding` — tells the compiler no stdlib exists; without it the compiler may silently
-  replace loops/mem ops with `memcpy`/`memset` calls that don't exist in a no-libc setup
 - `-nodefaultlibs` — weaker than `-nostdlib`, skips default libs but keeps startup files; useful
   when you want musl's libc but still need the compiler runtime (`libgcc`/`compiler-rt`)
 - `-rtlib=compiler-rt` — The compiler runtime provides low-level helpers the compiler itself emits calls to — things like software division, 64-bit arithmetic on 32-bit systems,
   sanitizer support. gcc has libgcc for this, clang has compiler-rt.
 - `-fuse-ld=lld` — tells clang to use lld instead of the system linker (GNU ld)
+- `-ffreestanding` — tells the compiler no stdlib exists; without it the compiler may silently
+  replace loops/mem ops with `memcpy`/`memset` calls that don't exist in a no-libc setup
 
 **Verify the same way**
 ```
