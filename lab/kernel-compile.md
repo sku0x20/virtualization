@@ -48,7 +48,7 @@ make menuconfig
 ### 3. Compile
 
 ```
-apt-get install -y bc
+apt-get install -y libelf-dev
 make -j$(nproc)
 ```
 
