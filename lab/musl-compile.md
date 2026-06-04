@@ -37,3 +37,9 @@ cd musl-1.2.6
 apt-get install -y gcc make
 ./configure --prefix=/usr/local/musl
 ```
+
+### 3. Compile
+
+```
+make -j$(nproc)
+```
