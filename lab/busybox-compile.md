@@ -97,5 +97,3 @@ ldd busybox
 ```
 
 `--list` prints every applet compiled in — the count gives a quick sanity check that nothing was silently skipped.
-
----
