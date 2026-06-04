@@ -125,10 +125,10 @@ apt-get install -y clang musl-dev
 
 **Compile**
 ```
-make CC="clang --target=x86_64-linux-musl -ffreestanding -rtlib=compiler-rt" \
+make CC="clang --target=x86_64-linux-musl -ffreestanding" \
   HOSTCC=clang -j$(nproc) \
   CFLAGS="-nostdinc -isystem /usr/include/x86_64-linux-musl -isystem /usr/local/kernel-headers/include" \
-  LDFLAGS="-nostdlib -L /usr/lib/x86_64-linux-musl -lc"
+  LDFLAGS="-nostdlib -rtlib=compiler-rt -L /usr/lib/x86_64-linux-musl -lc"
 ```
 
 - `HOSTCC=clang` — builds host-side build tools (e.g. `fixdep`) with clang too
