@@ -12,7 +12,7 @@ Understand what goes into a kernel build: configuration, compilation, and the ou
 - [ ] Configure — start from `tinyconfig` or `defconfig`, strip down
 - [ ] Disable modules entirely (`CONFIG_MODULES=n`)
 - [ ] Compile
-- [ ] Note what the output artifacts are (`vmlinuz`, `bzImage`) and where they land
+- [ ] Note what the output artifacts are and where they land
 
 ## Steps
 
@@ -51,4 +51,14 @@ make menuconfig
 apt-get install -y libelf-dev bc
 make -j$(nproc)
 ```
+
+### 4. Output
+
+The kernel image lands at:
+
+```
+arch/x86/boot/bzImage
+```
+
+`vmlinuz` is just the name distros use after installing — same file.
 
