@@ -21,8 +21,6 @@ Understand what goes into a kernel build: configuration, compilation, and the ou
 - Ubuntu Server (minimal install) environment
 - Internet access — needed to download the kernel tarball
 
----
-
 ### 1. Get the source
 
 Check the latest stable release at kernel.org, then:
@@ -33,8 +31,6 @@ curl -sfL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.tar.xz -o linux
 tar -xf linux-7.0.tar.xz
 cd linux-7.0
 ```
-
----
 
 ### 2. Configure
 
@@ -56,5 +52,3 @@ grep CONFIG_MODULES .config
 ```
 
 Expected: `CONFIG_MODULES=n`
-
----
