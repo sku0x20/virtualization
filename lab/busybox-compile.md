@@ -4,7 +4,8 @@ Compile BusyBox as a static binary from source — one binary, all tools, no sha
 
 ## Goal
 
-Understand how BusyBox bundles hundreds of tools into a single binary and how to build it statically so it works in any minimal root without a dynamic linker.
+Understand how BusyBox bundles hundreds of tools into a single binary and how to build it statically
+so it works in any minimal root without a dynamic linker.
 
 ## Steps
 
@@ -19,11 +20,15 @@ apt-get update
 apt-get install -y gcc make musl-tools perl bzip2 libncurses-dev xz-utils flex bison rsync
 ```
 
-`musl-tools` provides the `musl-gcc` wrapper — use it instead of `gcc` when compiling BusyBox. Musl is designed for clean static linking; glibc is not (it `dlopen()`s NSS modules at runtime for DNS/user lookups, so a "static" glibc binary isn't truly portable).
+`musl-tools` provides the `musl-gcc` wrapper — use it instead of `gcc` when compiling BusyBox. Musl
+is designed for clean static linking; glibc is not (it `dlopen()`s NSS modules at runtime for
+DNS/user lookups, so a "static" glibc binary isn't truly portable).
 
 **Install kernel headers**
 
-The `linux-headers-*` apt package is for building kernel modules — not suitable for userspace compilation. Download the kernel source and run `headers_install` instead, which produces sanitized userspace-only headers:
+The `linux-headers-*` apt package is for building kernel modules — not suitable for userspace
+compilation. Download the kernel source and run `headers_install` instead, which produces sanitized
+userspace-only headers:
 
 ```
 curl -sfL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.tar.xz -o linux-7.0.tar.xz
@@ -135,4 +140,5 @@ ldd busybox
 ./busybox echo "hello from clang busybox"
 ```
 
-The "Avoid gcc-specific code constructs" setting from step 2 is what makes this work cleanly — without it, clang chokes on a handful of gcc extensions in the BusyBox source.
+The "Avoid gcc-specific code constructs" setting from step 2 is what makes this work cleanly —
+without it, clang chokes on a handful of gcc extensions in the BusyBox source.
