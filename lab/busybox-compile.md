@@ -65,6 +65,7 @@ make menuconfig
 In menuconfig, make the following changes:
 
 - *Networking Utilities* → uncheck `tc` — it uses kernel headers removed in 7.0
+- *Settings* → check `Build BusyBox as a static binary`
 - *Settings* → uncheck `Use -static-libgcc` — not needed when linking against musl
 - *Settings* → check `Avoid using gcc-specific code constructs` — keeps the build portable and musl-compatible
 
