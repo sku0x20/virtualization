@@ -111,7 +111,7 @@ A drop-in swap for step 3. Everything else (config, kernel headers) stays the sa
 
 **Install clang and musl dev files**
 ```
-apt-get install -y clang musl-dev
+apt-get install -y clang lld musl-dev
 ```
 
 `musl-dev` provides the musl headers and static lib so clang can link against it instead of glibc.
@@ -128,7 +128,7 @@ apt-get install -y clang musl-dev
 make CC="clang --target=x86_64-linux-musl -ffreestanding" \
   HOSTCC=clang -j$(nproc) \
   CFLAGS="-nostdinc -isystem /usr/include/x86_64-linux-musl -isystem /usr/local/kernel-headers/include" \
-  LDFLAGS="-nostdlib -rtlib=compiler-rt -L /usr/lib/x86_64-linux-musl -lc"
+  LDFLAGS="-nostdlib -rtlib=compiler-rt -fuse-ld=lld -L /usr/lib/x86_64-linux-musl -lc"
 ```
 
 - `HOSTCC=clang` — builds host-side build tools (e.g. `fixdep`) with clang too
@@ -147,6 +147,7 @@ make CC="clang --target=x86_64-linux-musl -ffreestanding" \
   when you want musl's libc but still need the compiler runtime (`libgcc`/`compiler-rt`)
 - `-rtlib=compiler-rt` — The compiler runtime provides low-level helpers the compiler itself emits calls to — things like software division, 64-bit arithmetic on 32-bit systems,
   sanitizer support. gcc has libgcc for this, clang has compiler-rt.
+- `-fuse-ld=lld` — tells clang to use lld instead of the system linker (GNU ld)
 
 **Verify the same way**
 ```
