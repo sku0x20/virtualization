@@ -111,7 +111,7 @@ apt-get install -y clang musl-dev
 
 `musl-dev` provides the musl headers and static lib so clang can link against it instead of glibc.
 
-> **Why not needed for `musl-gcc`?** `musl-tools` installs `musl-gcc` as a wrapper script around `gcc` with musl's header and library paths baked in via a GCC specs file — the wrapper finds musl automatically. Clang has no such wrapper; `--target=x86_64-linux-musl` tells it which ABI to target but not where the files are. `musl-dev` is what puts them at standard system paths where clang can find them.
+> **Why not needed for `musl-gcc`?** `musl-tools` installs `musl-gcc` as a wrapper script around `gcc` with musl's header and library paths baked in via a GCC specs file — the wrapper finds musl automatically. Clang has no such wrapper; `--target=x86_64-linux-musl` tells it which ABI to target but not where the files are. `musl-dev` is what puts them at standard system paths where clang can find them. (Also: `musl-tools` already depends on `musl-dev`, so it's pulled in automatically when using `musl-gcc`.)
 
 **Compile**
 ```
