@@ -60,3 +60,15 @@ Build produces under `lib/` and `include/`:
 ```
 
 musl prints its version when the shared library is run directly.
+
+---
+
+## Adventure: Compile with Clang
+
+A drop-in swap for steps 2 and 3. Everything else stays the same.
+
+```
+apt-get install -y clang
+./configure --prefix=/usr/local/musl CC=clang
+make -j$(nproc)
+```
