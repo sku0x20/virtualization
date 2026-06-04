@@ -81,6 +81,17 @@ make CC=musl-gcc -j$(nproc) CFLAGS="-I/usr/local/kernel-headers/include"
 
 ---
 
+### 4. Verify
+
+```
+file busybox
+ldd busybox
+```
+
+`file` should report `statically linked`. `ldd` should say `not a dynamic executable`.
+
+---
+
 ## TODO
 
 - [ ] Get BusyBox source (busybox.net tarball)
