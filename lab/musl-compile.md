@@ -43,3 +43,20 @@ apt-get install -y gcc make
 ```
 make -j$(nproc)
 ```
+
+### 4. Output
+
+Build produces under `lib/` and `include/`:
+
+- `lib/libc.so` — shared library
+- `lib/libc.a` — static library
+- `lib/musl-gcc.specs` — specs file used by the `musl-gcc` wrapper
+- `include/` — musl's C standard headers
+
+### 5. Verify
+
+```
+./lib/libc.so
+```
+
+musl prints its version when the shared library is run directly.
