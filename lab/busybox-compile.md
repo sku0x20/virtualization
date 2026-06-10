@@ -172,6 +172,12 @@ the compiler finds musl automatically. Without that wrapper, stock gcc's default
 `/usr/include` first — which means glibc headers win. `-nostdinc` strips all default include paths,
 and then explicit `-isystem` ordering puts musl first.
 
+The include and lib paths used below come directly from musl's own specs file. Inspect it to find
+the right values for your install:
+```
+cat /usr/local/musl/lib/musl-gcc.specs
+```
+
 **Compile**
 ```
 make -j$(nproc) \
