@@ -14,7 +14,7 @@ make -j$(nproc)
 make install
 ```
 
-## Adventure: Compile with Clang
+## With Clang
 
 ```
 xbps-install -y clang
