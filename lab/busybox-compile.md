@@ -159,3 +159,39 @@ ldd busybox
 
 The "Avoid gcc-specific code constructs" setting from step 2 is what makes this work cleanly —
 without it, clang chokes on a handful of gcc extensions in the BusyBox source.
+
+---
+
+## Adventure: Compile with GCC + self-compiled musl
+
+An alternative to step 3 when musl is compiled from source and installed locally (e.g. at
+`/usr/local/musl`) rather than pulled in via `musl-tools`.
+
+The `musl-gcc` wrapper from `musl-tools` works by embedding musl's paths into a GCC specs file so
+the compiler finds musl automatically. Without that wrapper, stock gcc's default specs put
+`/usr/include` first — which means glibc headers win. `-nostdinc` strips all default include paths,
+and then explicit `-isystem` ordering puts musl first.
+
+**Compile**
+```
+make -j$(nproc) \
+  CFLAGS="-nostdinc -isystem /usr/local/musl/include -isystem /usr/include" \
+  LDFLAGS="-L /usr/local/musl/lib"
+```
+
+- `-nostdinc` — disables gcc's default include search paths; without it gcc's specs inject
+  `/usr/include` before anything you pass, so glibc headers are found first
+- `-isystem /usr/local/musl/include` — musl's headers from the local install; listed before
+  `/usr/include` so musl wins when both define the same header
+- `-isystem /usr/include` — system includes, needed for linux kernel headers
+  (`/usr/include/linux`); these are shipped by glibc's dev package and are sufficient for BusyBox —
+  no separate `headers_install` step required
+- `-L /usr/local/musl/lib` — points the linker at musl's static library; `CONFIG_STATIC=y` in
+  `.config` tells BusyBox's Makefile to pass `-static` to the linker, so musl's `libc.a` is linked in
+
+**Verify the same way**
+```
+file busybox
+ldd busybox
+./busybox echo "hello from self-compiled musl busybox"
+```
