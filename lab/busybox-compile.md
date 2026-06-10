@@ -1,41 +1,8 @@
 # BusyBox Compile Lab
 
-Compile BusyBox statically from source.
+Compile BusyBox statically from source. (package manager: xbps)
 
 ## Steps
-
-### Prerequisites
-
-- [Avoid](https://www.github.com/sku0x20/avoid) (Void-based) environment
-- Internet access — needed to download the BusyBox tarball
-
-**Install build tools**
-```
-xbps-install -Su
-xbps-install -y gcc make musl perl bzip2 ncurses-devel xz flex bison rsync
-```
-
-`musl-tools` provides the `musl-gcc` wrapper — use it instead of `gcc` when compiling BusyBox. Musl
-is designed for clean static linking; glibc is not (it `dlopen()`s NSS modules at runtime for
-DNS/user lookups, so a "static" glibc binary isn't truly portable).
-
-**Install kernel headers**
-
-The `linux-headers` xbps package is for building kernel modules — not suitable for userspace
-compilation. Download the kernel source and run `headers_install` instead, which produces sanitized
-userspace-only headers:
-
-```
-curl -sfL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.tar.xz -o linux-7.0.tar.xz
-tar -xf linux-7.0.tar.xz
-cd linux-7.0
-make mrproper
-make defconfig
-make headers_install ARCH=x86_64 INSTALL_HDR_PATH=/usr/local/kernel-headers
-cd ..
-```
-
----
 
 ### 1. Get the source
 
