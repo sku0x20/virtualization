@@ -1,4 +1,6 @@
-# GPT + GRUB Lab
+# Minimal Linux Lab
+
+> untested — coming back to this
 
 Learn by doing — replicate what an OS installer does, manually.
 
