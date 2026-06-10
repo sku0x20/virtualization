@@ -1,6 +1,8 @@
 # Minimal Linux Lab
 
-> untested — coming back to this (using [Avoid](https://github.com/sku0x20/avoid))
+> untested — coming back to this
+
+related: [Avoid](https://github.com/sku0x20/avoid) — custom minimal distro, doing similar things there.
 
 Learn by doing — replicate what an OS installer does, manually.
 
