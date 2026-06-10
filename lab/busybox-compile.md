@@ -41,7 +41,7 @@ ldd busybox
 
 ## With Clang & Musl
 
-clang is mostly a drop in replacement so most of the things should work out of the box just just `CC` change
+clang is mostly a drop in replacement so most of the things should work out of the box just `CC` change
 
 ```
 # direct correspondance only CC change
@@ -50,57 +50,19 @@ make -j2 CC="clang" CFLAGS="-nostdinc -isystem /usr/local/musl/include -isystem 
 make -j2 CC="clang" CFLAGS="-nostdinc -isystem /usr/local/musl/include -isystem /usr/include" LDFLAGS="-L /usr/local/musl/lib -rtlib=compiler-rt -fuse-ld=lld"
 ```
 
-=============================
+## With Kernel Headers From Source
 
-## Adventure: Compile with GCC + self-compiled musl
-
-An alternative to step 3 when musl is compiled from source and installed locally (e.g. at
-`/usr/local/musl`) rather than pulled in via `musl-tools`.
-
-The `musl-gcc` wrapper from `musl-tools` works by embedding musl's paths into a GCC specs file so
-the compiler finds musl automatically. Without that wrapper, stock gcc's default specs put
-`/usr/include` first — which means glibc headers win. `-nostdinc` strips all default include paths,
-and then explicit `-isystem` ordering puts musl first.
-
-The include and lib paths used below come directly from musl's own specs file. Inspect it to find
-the right values for your install:
+- /usr/include is mostly handled by glibc and most of the time installed when installing gcc.
+- /linux is also from glibc in most case.
+- if not there install linux headers via package-manager.
+- else follow this to make them from src. and include them in the `CFLAGS`
 
 ```
-
-cat /usr/local/musl/lib/musl-gcc.specs
-
-```
-
-**Compile**
-
-```
-
-make -j$(nproc) \
- CFLAGS="-nostdinc -isystem /usr/local/musl/include -isystem /usr/include" \
- LDFLAGS="-L /usr/local/musl/lib"
-
-```
-
-- `-nostdinc` — disables gcc's default include search paths; without it gcc's specs inject
-  `/usr/include` before anything you pass, so glibc headers are found first
-- `-isystem /usr/local/musl/include` — musl's headers from the local install; listed before
-  `/usr/include` so musl wins when both define the same header
-- `-isystem /usr/include` — system includes, needed for linux kernel headers
-  (`/usr/include/linux`); these are shipped by glibc's dev package and are sufficient for BusyBox —
-  no separate `headers_install` step required
-- `-L /usr/local/musl/lib` — points the linker at musl's static library; `CONFIG_STATIC=y` in
-  `.config` tells BusyBox's Makefile to pass `-static` to the linker, so musl's `libc.a` is linked in
-
-**Verify the same way**
-
-```
-
-file busybox
-ldd busybox
-./busybox echo "hello from self-compiled musl busybox"
-
-```
-
-```
-
+curl -sfL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.tar.xz -o linux-7.0.tar.xz
+tar -xf linux-7.0.tar.xz && mv linux-7.0 linux
+cd linux
+# cleanup
+make mrproper
+make defconfig
+make headers_install ARCH=x86_64 INSTALL_HDR_PATH=/usr/local/kernel-headers
 ```
