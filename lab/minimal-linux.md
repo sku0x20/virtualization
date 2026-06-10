@@ -1,6 +1,6 @@
 # Minimal Linux Lab
 
-> untested — coming back to this
+> untested — coming back to this (using [Avoid](https://github.com/sku0x20/avoid))
 
 Learn by doing — replicate what an OS installer does, manually.
 
