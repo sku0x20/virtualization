@@ -11,13 +11,13 @@ so it works in any minimal root without a dynamic linker.
 
 ### Prerequisites
 
-- Ubuntu Server (minimal install) environment
+- [Avoid](https://www.github.com/sku0x20/avoid) (Void-based) environment
 - Internet access — needed to download the BusyBox tarball
 
 **Install build tools**
 ```
-apt-get update
-apt-get install -y gcc make musl-tools perl bzip2 libncurses-dev xz-utils flex bison rsync
+xbps-install -Su
+xbps-install -y gcc make musl perl bzip2 ncurses-devel xz flex bison rsync
 ```
 
 `musl-tools` provides the `musl-gcc` wrapper — use it instead of `gcc` when compiling BusyBox. Musl
@@ -26,7 +26,7 @@ DNS/user lookups, so a "static" glibc binary isn't truly portable).
 
 **Install kernel headers**
 
-The `linux-headers-*` apt package is for building kernel modules — not suitable for userspace
+The `linux-headers` xbps package is for building kernel modules — not suitable for userspace
 compilation. Download the kernel source and run `headers_install` instead, which produces sanitized
 userspace-only headers:
 
@@ -112,7 +112,7 @@ A drop-in swap for step 3. Everything else (config, kernel headers) stays the sa
 
 **Install clang and musl dev files**
 ```
-apt-get install -y clang lld musl-dev
+xbps-install -y clang lld musl-devel
 ```
 
 `musl-dev` provides the musl headers and static lib so clang can link against it instead of glibc.
