@@ -1,33 +1,22 @@
 # Musl Compile Lab
 
-Compile musl libc from source — the clean, minimal C standard library.
-
-## Goal
-
-Understand how a C standard library is built and what it produces.
-
-## Steps
-
-### Prerequisites
-
-- Ubuntu Server (minimal install) environment
-- Internet access — needed to download the musl tarball
+Compile musl libc from source. (package manager: xbps)
 
 ### 1. Get the source
 
 Check the latest release at musl.libc.org, then:
 
 ```
-apt-get install -y curl xz-utils
+xbps-install -y curl xz
 curl -sfL https://musl.libc.org/releases/musl-1.2.6.tar.gz -o musl-1.2.6.tar.gz
-tar -xf musl-1.2.6.tar.gz
-cd musl-1.2.6
+tar -xf musl-1.2.6.tar.gz && mv musl-1.2.6 musl
+cd musl
 ```
 
 ### 2. Configure
 
 ```
-apt-get install -y gcc make
+xbps-install -y gcc make
 ./configure --prefix=/usr/local/musl
 ```
 
@@ -61,7 +50,7 @@ musl prints its version when the shared library is run directly.
 A drop-in swap for steps 2 and 3. Everything else stays the same.
 
 ```
-apt-get install -y clang
+xbps-install -y clang
 ./configure --prefix=/usr/local/musl CC=clang
 make -j$(nproc)
 ```
