@@ -3,7 +3,6 @@
 Compile a minimal Linux kernel from source. (package manager: xbps)
 
 ```
-xbps-install -y curl xz make gcc flex bison perl ncurses-devel elfutils-devel bc
 curl -sfL https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-7.0.tar.xz -o linux-7.0.tar.xz
 tar -xf linux-7.0.tar.xz && mv linux-7.0 linux
 cd linux
@@ -14,6 +13,8 @@ make -j$(nproc)
 # output: arch/x86/boot/bzImage
 file arch/x86/boot/bzImage
 strings arch/x86/boot/bzImage | grep "Linux version"
+# optional: installs bzImage + System.map to /boot
+make install
 ```
 
 ---
