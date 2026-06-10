@@ -2,79 +2,52 @@
 
 Compile BusyBox statically from source. (package manager: xbps)
 
-## Steps
+---
 
-### 1. Get the source
+## With gcc & Musl
 
-Check the latest stable release at busybox.net/downloads, then:
+- `-isystem /usr/include` required for linux headers
+- not using `musl-gcc` which uses `musl-gcc.specs` cause it put user provided dirs before its dirs. then /usr/include gets priority rather than musl include dirs.
 
 ```
 curl -sfL https://busybox.net/downloads/busybox-1.38.0.tar.bz2 -o busybox-1.38.0.tar.bz2
-tar -xf busybox-1.38.0.tar.bz2
-cd busybox-1.38.0
-```
-
----
-
-### 2. Configure
-
-Generate a default config:
-
-```
+tar -xf busybox-1.38.0.tar.bz2 && mv busybox-1.38.0 busybox
+cd busybox
+# Generate a default config:
 make menuconfig
 ```
 
-In menuconfig, make the following changes:
+In menuconfig:
 
-- *Networking Utilities* → uncheck `tc` — it uses kernel headers removed in 7.0
-- *Settings* → check `Build BusyBox as a static binary`
-- *Settings* → uncheck `Use -static-libgcc` — not needed when linking against musl
-- *Settings* → check `Avoid using gcc-specific code constructs` — keeps the build portable and musl-compatible
+- _Networking Utilities_ → uncheck `tc` (uses removed kernel code)
+- _Settings_ → check `Build BusyBox as a static binary`
+- _Settings_ → uncheck `Use -static-libgcc` - not needed when linking against musl
+- _Settings_ → check `Avoid using gcc-specific code constructs` - keeps the build portable and musl-compatible
 
-Verify:
 ```
+# should be CONFIG_STATIC=y in .config
 grep CONFIG_STATIC .config
-```
-Expected: `CONFIG_STATIC=y`
-
----
-
-### 3. Compile
-
-```
-make CC=musl-gcc -j$(nproc) CFLAGS="-I/usr/local/kernel-headers/include"
-```
-
-`CC=musl-gcc` routes all compilation through musl's wrapper so the static binary has no glibc dependency.
-
----
-
-### 4. Verify
-
-```
+# musl => install via package-manager or build && make install
+make -j$(nproc) CFLAGS="-nostdinc -isystem /usr/local/musl/include -isystem /usr/include" LDFLAGS="-L /usr/local/musl/lib"
 file busybox
 ldd busybox
-```
-
-`file` should report `statically linked`. `ldd` should say `not a dynamic executable`.
-
-```
 ./busybox echo "hello from busybox"
 ./busybox ls /
 ./busybox --list | wc -l
 ```
 
-`--list` prints every applet compiled in — the count gives a quick sanity check that nothing was silently skipped.
-
----
+## ==================================
 
 ## Adventure: Compile with Clang
 
 A drop-in swap for step 3. Everything else (config, kernel headers) stays the same.
 
 **Install clang and musl dev files**
+
 ```
+
 xbps-install -y clang lld musl-devel
+
 ```
 
 `musl-dev` provides the musl headers and static lib so clang can link against it instead of glibc.
@@ -87,11 +60,14 @@ xbps-install -y clang lld musl-devel
 > already depends on `musl-dev`, so it's pulled in automatically when using `musl-gcc`.)
 
 **Compile**
+
 ```
+
 make CC="clang --target=x86_64-linux-musl" \
-  HOSTCC=clang -j$(nproc) \
-  CFLAGS="-nostdinc -isystem /usr/include/x86_64-linux-musl -isystem /usr/local/kernel-headers/include" \
-  LDFLAGS="-nostdlib -rtlib=compiler-rt -fuse-ld=lld -L /usr/lib/x86_64-linux-musl -lc"
+ HOSTCC=clang -j$(nproc) \
+ CFLAGS="-nostdinc -isystem /usr/include/x86_64-linux-musl -isystem /usr/local/kernel-headers/include" \
+ LDFLAGS="-nostdlib -rtlib=compiler-rt -fuse-ld=lld -L /usr/lib/x86_64-linux-musl -lc"
+
 ```
 
 - `HOSTCC=clang` — builds host-side build tools (e.g. `fixdep`) with clang too
@@ -113,10 +89,13 @@ make CC="clang --target=x86_64-linux-musl" \
   replace loops/mem ops with `memcpy`/`memset` calls that don't exist in a no-libc setup
 
 **Verify the same way**
+
 ```
+
 file busybox
 ldd busybox
 ./busybox echo "hello from clang busybox"
+
 ```
 
 The "Avoid gcc-specific code constructs" setting from step 2 is what makes this work cleanly —
@@ -136,15 +115,21 @@ and then explicit `-isystem` ordering puts musl first.
 
 The include and lib paths used below come directly from musl's own specs file. Inspect it to find
 the right values for your install:
+
 ```
+
 cat /usr/local/musl/lib/musl-gcc.specs
+
 ```
 
 **Compile**
+
 ```
+
 make -j$(nproc) \
-  CFLAGS="-nostdinc -isystem /usr/local/musl/include -isystem /usr/include" \
-  LDFLAGS="-L /usr/local/musl/lib"
+ CFLAGS="-nostdinc -isystem /usr/local/musl/include -isystem /usr/include" \
+ LDFLAGS="-L /usr/local/musl/lib"
+
 ```
 
 - `-nostdinc` — disables gcc's default include search paths; without it gcc's specs inject
@@ -158,8 +143,15 @@ make -j$(nproc) \
   `.config` tells BusyBox's Makefile to pass `-static` to the linker, so musl's `libc.a` is linked in
 
 **Verify the same way**
+
 ```
+
 file busybox
 ldd busybox
 ./busybox echo "hello from self-compiled musl busybox"
+
+```
+
+```
+
 ```
