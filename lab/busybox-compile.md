@@ -36,72 +36,21 @@ ldd busybox
 ./busybox --list | wc -l
 ```
 
-## ==================================
+- `-nostdlib -lc` is same as not passing linker automatically links it.
+- also `-static` flag is passed implicitly by the busybox config.
 
-## Adventure: Compile with Clang
+## With Clang & Musl
 
-A drop-in swap for step 3. Everything else (config, kernel headers) stays the same.
-
-**Install clang and musl dev files**
-
-```
-
-xbps-install -y clang lld musl-devel
+clang is mostly a drop in replacement so most of the things should work out of the box just just `CC` change
 
 ```
-
-`musl-dev` provides the musl headers and static lib so clang can link against it instead of glibc.
-
-> **Why not needed for `musl-gcc`?** `musl-tools` installs `musl-gcc` as a wrapper script around
-> `gcc` with musl's header and library paths baked in via a GCC specs file — the wrapper finds musl
-> automatically. Clang has no such wrapper; `--target=x86_64-linux-musl` only sets the ABI, clang
-> still picks up glibc from system paths unless `--sysroot` redirects it. `musl-dev` installs musl
-> under `/usr/lib/x86_64-linux-musl`, which is what `--sysroot` points at. (Also: `musl-tools`
-> already depends on `musl-dev`, so it's pulled in automatically when using `musl-gcc`.)
-
-**Compile**
-
+# direct correspondance only CC change
+make -j2 CC="clang" CFLAGS="-nostdinc -isystem /usr/local/musl/include -isystem /usr/include" LDFLAGS="-L /usr/local/musl/lib"
+# can be improved a bit more
+make -j2 CC="clang" CFLAGS="-nostdinc -isystem /usr/local/musl/include -isystem /usr/include" LDFLAGS="-L /usr/local/musl/lib -rtlib=compiler-rt -fuse-ld=lld"
 ```
 
-make CC="clang --target=x86_64-linux-musl" \
- HOSTCC=clang -j$(nproc) \
- CFLAGS="-nostdinc -isystem /usr/include/x86_64-linux-musl -isystem /usr/local/kernel-headers/include" \
- LDFLAGS="-nostdlib -rtlib=compiler-rt -fuse-ld=lld -L /usr/lib/x86_64-linux-musl -lc"
-
-```
-
-- `HOSTCC=clang` — builds host-side build tools (e.g. `fixdep`) with clang too
-- `--target=x86_64-linux-musl` — sets the target ABI; alone it doesn't change which libc gets
-  linked, clang still searches system paths where glibc lives
-- `-nostdinc` — disables all default include paths so glibc headers under `/usr/include` are not
-  picked up; only explicitly passed `-isystem`/`-I` paths are searched
-- `-isystem /usr/include/x86_64-linux-musl` — musl's headers (installed by `musl-dev`); `-isystem`
-  instead of `-I` so warnings from musl's own headers are suppressed
-- `-nostdlib` — disables default lib search paths and startup files so glibc's `libc.a` and
-  `crt0.o` are not pulled in
-- `-L/usr/lib/x86_64-linux-musl -lc` — explicitly link musl's `libc.a` from its install location
-- `-nodefaultlibs` — weaker than `-nostdlib`, skips default libs but keeps startup files; useful
-  when you want musl's libc but still need the compiler runtime (`libgcc`/`compiler-rt`)
-- `-rtlib=compiler-rt` — The compiler runtime provides low-level helpers the compiler itself emits calls to — things like software division, 64-bit arithmetic on 32-bit systems,
-  sanitizer support. gcc has libgcc for this, clang has compiler-rt.
-- `-fuse-ld=lld` — tells clang to use lld instead of the system linker (GNU ld)
-- `-ffreestanding` — tells the compiler no stdlib exists; without it the compiler may silently
-  replace loops/mem ops with `memcpy`/`memset` calls that don't exist in a no-libc setup
-
-**Verify the same way**
-
-```
-
-file busybox
-ldd busybox
-./busybox echo "hello from clang busybox"
-
-```
-
-The "Avoid gcc-specific code constructs" setting from step 2 is what makes this work cleanly —
-without it, clang chokes on a handful of gcc extensions in the BusyBox source.
-
----
+=============================
 
 ## Adventure: Compile with GCC + self-compiled musl
 
