@@ -1,11 +1,6 @@
 # BusyBox Compile Lab
 
-Compile BusyBox as a static binary from source — one binary, all tools, no shared libs.
-
-## Goal
-
-Understand how BusyBox bundles hundreds of tools into a single binary and how to build it statically
-so it works in any minimal root without a dynamic linker.
+Compile BusyBox statically from source.
 
 ## Steps
 
